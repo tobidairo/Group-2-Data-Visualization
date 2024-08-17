@@ -323,7 +323,7 @@ def get_mapping_dict(selected_variable):
     else:
         return {-1: 'Other'}
 
-def update_state_map(selected_year, selected_variable, selected_variable_2, df, aggregated_data):
+def update_state_map(selected_year, selected_variable, df, aggregated_data):
 
     income_data = aggregated_data['income'][aggregated_data['income']['year'] == selected_year].drop(columns=['year'])
     height_data = aggregated_data['height'][aggregated_data['height']['year'] == selected_year].drop(columns=['year'])
@@ -334,16 +334,6 @@ def update_state_map(selected_year, selected_variable, selected_variable_2, df, 
     merged_data = income_data.merge(height_data, on='state_code', how='inner') \
                              .merge(weight_data, on='state_code', how='inner') \
                              .merge(age_data, on='state_code', how='inner')
-
-    df_filtered = df[df['year'] == selected_year]
-    df_grouped = df_filtered.groupby(selected_variable_2)
-    weighted_frequency = df_grouped['wt'].sum().reset_index()
-    weighted_frequency.columns = [selected_variable_2, 'weighted_frequency']
-    mapping_dict = get_mapping_dict(selected_variable_2)
-    weighted_frequency['mapped_labels'] = weighted_frequency[selected_variable_2].map(mapping_dict)
-
-    max_value = weighted_frequency['weighted_frequency'].max()
-    max_label = weighted_frequency.loc[weighted_frequency['weighted_frequency'] == max_value, 'mapped_labels'].values[0]
 
     fixed_ranges = {
     'Average Income': (30000, 80000),  # Example range in dollars
@@ -375,20 +365,18 @@ def update_state_map(selected_year, selected_variable, selected_variable_2, df, 
         },
     )
 
-    column_chart = px.bar(
-        data_frame=merged_data,
-        x='state_code',
-        y=selected_variable,
-        labels={
-            'state_code': 'State',
-            selected_variable: selected_variable
-        },
-        color=selected_variable,
-        color_continuous_scale=px.colors.sequential.Inferno_r,
-        range_y=fixed_ranges[selected_variable]
-    )
+    return choropleth_map
 
+def update_frequency_chart(selected_year, selected_variable, df):
+    df_filtered = df[df['year'] == selected_year]
+    df_grouped = df_filtered.groupby(selected_variable)
+    weighted_frequency = df_grouped['wt'].sum().reset_index()
+    weighted_frequency.columns = [selected_variable, 'weighted_frequency']
+    mapping_dict = get_mapping_dict(selected_variable)
+    weighted_frequency['mapped_labels'] = weighted_frequency[selected_variable].map(mapping_dict)
 
+    max_value = weighted_frequency['weighted_frequency'].max()
+    max_label = weighted_frequency.loc[weighted_frequency['weighted_frequency'] == max_value, 'mapped_labels'].values[0]
 
     frequency_chart = px.bar(
         weighted_frequency,
@@ -396,9 +384,9 @@ def update_state_map(selected_year, selected_variable, selected_variable_2, df, 
         y='weighted_frequency',
         color='weighted_frequency',
         color_continuous_scale=px.colors.sequential.PuBuGn,
-        title=f'<b>Adult population count by {selected_variable_2} in {selected_year}</b>',
+        title=f'<b>Adult population count by {selected_variable} in {selected_year}</b>',
         labels={
-            'mapped_labels': selected_variable_2,
+            'mapped_labels': selected_variable,
             'weighted_frequency': 'Count'
         },
         template='plotly',
@@ -409,7 +397,7 @@ def update_state_map(selected_year, selected_variable, selected_variable_2, df, 
     # Code to enhance chart layout
     frequency_chart.update_layout(
         title_font_size=24,  # Increase title font size
-        xaxis_title=f'<b>{selected_variable_2}</b>',  # Bold x-axis label
+        xaxis_title=f'<b>{selected_variable}</b>',  # Bold x-axis label
         yaxis_title='<b>Count</b>',  # Bold y-axis label
         margin=dict(t=50, b=50, l=50, r=50),  # Adjust margins
         coloraxis_colorbar=dict(
@@ -438,6 +426,4 @@ def update_state_map(selected_year, selected_variable, selected_variable_2, df, 
         texttemplate='%{text:.2s}',
     )
 
-
-
-    return choropleth_map, column_chart, f"Selected variable: {selected_variable_2}", frequency_chart
+    return f"Selected variable: {selected_variable}", frequency_chart

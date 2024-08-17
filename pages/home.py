@@ -2,21 +2,14 @@ import pandas as pd
 import numpy as np
 import plotly.express as px
 import dash
-from dash import Dash, dcc, html
+from dash import Dash, dcc, html, register_page, callback
 from dash.dependencies import Input, Output
 # from pyngrok import ngrok
 from mappings import dtypes, state_mapping, income_bracket_midpoints, age_range_midpoints, state_variable_mappings, population_dropdown_mappings
-from helper_functions import weighted_mean, weighted_median_interpolated, weighted_frequency, aggregate_weighted_frequency, aggregate_custom, get_mapping_dict, update_state_map
+from helper_functions import weighted_mean, weighted_median_interpolated, weighted_frequency, aggregate_weighted_frequency, aggregate_custom, get_mapping_dict, update_state_map, update_frequency_chart
+from process_data import read_data
 
-print('Reading data...')
-df = pd.read_csv('data.csv', header=0, dtype=dtypes)
-print('Read data.')
-
-df['state_code'] = df['state'].map(state_mapping)
-
-df['income_midpoint'] = df['income'].map(income_bracket_midpoints)
-
-df['age_midpoint'] = df['age'].map(age_range_midpoints)
+from app import df
 
 # Aggregate data for continuous variables
 print('Aggregating data...')
@@ -36,11 +29,11 @@ aggregated_data = {
 }
 print('Finished aggregating data.')
 
-app = dash.Dash(__name__)
+register_page(__name__, name='State Map', path='/')
 
-app.layout = html.Div([
+layout = html.Div([
     html.Header(
-        html.H1("Demographics", style={'text-align': 'center', 'padding': '10px'}),
+        html.H1("State Map", style={'text-align': 'center', 'padding': '10px'}),
     ),
 
     # Variable selector and Year slider
@@ -81,54 +74,23 @@ app.layout = html.Div([
                 dcc.Graph(id='choropleth-map', style={'height': '500px'}),
                 style={'width': '48%', 'display': 'inline-block', 'padding': '20px','flex-grow': '1'}
             ),
-            html.Div(
-                dcc.Graph(id='column-chart', style={'height': '500px'}),
-                style={'width': '48%', 'display': 'inline-block', 'padding': '20px', 'flex-grow': '1'}
-            ),
         ],
         style={'display': 'flex', 'justify-content': 'space-between', 'align-items': 'center'}
-    ),
-
-    html.Div(
-    [
-        html.Div(
-                  [
-                      dcc.Dropdown(
-                          options=population_dropdown_mappings,
-                          value='age',
-                          placeholder='Select a variable',
-                          id='variable-selector-2'
-                      ),
-                      html.Div(id='dd-output-container-2')
-                  ]
-              ),
-              html.Div(
-                  dcc.Graph(id='frequency-chart', style={'height': '500px'}),
-                  style={'width': '48%', 'display': 'inline-block', 'padding': '20px', 'flex-grow': '1'}
-              )
-          ],
-          style={'display': 'flex', 'justify-content': 'space-between', 'align-items': 'center'}
-      )
+    )
 
 ])
 
-@app.callback(
-    [Output('choropleth-map', 'figure'),
-     Output('column-chart', 'figure'),
-     Output('dd-output-container-2', 'children'),
-     Output('frequency-chart', 'figure')],
+@callback(
+    [Output('choropleth-map', 'figure')],
     [Input('year-slider', 'value'),
-     Input('variable-selector', 'value'),
-     Input('variable-selector-2', 'value')]
+     Input('variable-selector', 'value')]
 )
 
-def update_plots(selected_year, selected_variable, selected_variable_2):
-    return(update_state_map(selected_year, selected_variable, selected_variable_2, df, aggregated_data))
+def update_plots(selected_year, selected_variable):
+    state_map = update_state_map(selected_year, selected_variable, df, aggregated_data)
+    return [state_map]
 
-def run_dash_app():
-    app.run_server(port=8050, debug=True)
 
-run_dash_app()
 
 
 
