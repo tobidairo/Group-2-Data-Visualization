@@ -6,6 +6,7 @@ from dash import Dash, dcc, html, page_registry, page_container
 from dash.dependencies import Input, Output
 from mappings import state_mapping, income_bracket_midpoints, age_range_midpoints, dtypes
 from process_data import read_data
+import dash_bootstrap_components as dbc
 
 print('Reading data...')
 df = read_data(dtypes)
@@ -18,16 +19,52 @@ df['income_midpoint'] = df['income'].map(income_bracket_midpoints)
 
 df['age_midpoint'] = df['age'].map(age_range_midpoints)
 
-app = Dash(__name__, use_pages=True)
+app = Dash(__name__, use_pages=True, external_stylesheets=[dbc.themes.SLATE])
+
+navbar = dbc.Navbar(
+    dbc.Container(
+        [
+            dbc.NavbarBrand("Survey Dashboard", href="/"),
+            dbc.Nav(
+                [
+                    dbc.NavItem(dbc.NavLink("State Map", href="/")),
+                    dbc.NavItem(dbc.NavLink("Summary", href="/summary")),
+                    dbc.NavItem(dbc.NavLink("Demographics", href="/demographics")),
+                    dbc.DropdownMenu(
+                        children=[
+                            dbc.DropdownMenuItem("More", header=True),
+                            dbc.DropdownMenuItem("User Guide", href="/user-guide"),
+                            dbc.DropdownMenuItem("About", href="/about"),
+                        ],
+                        nav=True,
+                        in_navbar=True,
+                        label="More",
+                    ),
+                ],
+                className="ml-auto",
+                navbar=True,
+            ),
+        ]
+    ),
+    color="dark",
+    dark=True,
+    sticky="top",
+)
+
+footer = dbc.Container(
+    dbc.Row(
+        [
+            dbc.Col(html.A("GitHub", href='/'), align='left'),
+        ],
+    ),
+    className='footer',
+    fluid=True
+)
 
 app.layout = html.Div([
-    html.H1("Dashboard App"),
-    html.Div([
-        html.Div(
-            dcc.Link(f"{page['name']} - {page['path']}", href=page['relative_path'])
-        ) for page in page_registry.values()
-    ]),
-    page_container
+    navbar,
+    page_container,
+    footer,
 ])
 
 def run_dash_app():

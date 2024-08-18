@@ -83,3 +83,50 @@ population_dropdown_mappings = [
                               {'label': 'Pneumonia Jab', 'value': 'pneumonia_jab'},
                               {'label': 'AIDS Test', 'value': 'aids_test'}
                           ]
+
+demographic_variable_mappings = [
+    {'label': 'Education', 'value': 'education'},
+    {'label': 'Sex', 'value': 'sex'},
+    {'label': 'Age', 'value': 'age'},
+    {'label': 'Income', 'value': 'income'},
+    {'label': 'Race', 'value': 'race'},
+    {'label': 'Employment', 'value': 'employment'},
+    {'label': 'Marital Status', 'value': 'marital_status'},
+    {'label': 'Children', 'value': 'children'}
+]
+
+anthropometric_variable_mappings = [
+    {'label': 'BMI Category', 'value': 'bmi_category'},
+    {'label': 'Overweight', 'value': 'overweight'},
+    {'label': 'Height', 'value': 'height'},
+    {'label': 'Weight', 'value': 'weight'}
+]
+
+chronic_condition_variable_mappings = [
+    {'label': 'Stroke', 'value': 'stroke'},
+    {'label': 'Asthma', 'value': 'asthma'},
+    {'label': 'Arthritis', 'value': 'arthritis'},
+    {'label': 'Cardiac Event', 'value': 'cardiac_event'}
+]
+
+healthcare_access_variable_mappings = [
+    {'label': 'Medcost', 'value': 'medcost'},
+    {'label': 'Checkup', 'value': 'checkup'},
+    {'label': 'Health Insurance', 'value': 'health_insurance'}
+]
+
+health_measure_variable_mappings = [
+    {'label': 'General Health', 'value': 'general_health'},
+    {'label': 'Mental Health', 'value': 'mental_health'},
+    {'label': 'Physical Health', 'value': 'physical_health'},
+    {'label': 'Poor Health', 'value': 'poor_health'}
+]
+
+lifestyle_variable_mappings = [
+    {'label': 'Smoking', 'value': 'smoking'},
+    {'label': 'Exercise', 'value': 'exercise'},
+    {'label': 'Binge Drinking', 'value': 'binge_drinking'},
+    {'label': 'Heavy Drinking', 'value': 'heavy_drinking'},
+    {'label': 'Stop Smoking', 'value': 'stop_smoking'},
+
+]

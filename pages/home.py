@@ -4,6 +4,7 @@ import plotly.express as px
 import dash
 from dash import Dash, dcc, html, register_page, callback
 from dash.dependencies import Input, Output
+import dash_bootstrap_components as dbc
 # from pyngrok import ngrok
 from mappings import dtypes, state_mapping, income_bracket_midpoints, age_range_midpoints, state_variable_mappings, population_dropdown_mappings
 from helper_functions import weighted_mean, weighted_median_interpolated, weighted_frequency, aggregate_weighted_frequency, aggregate_custom, get_mapping_dict, update_state_map, update_frequency_chart
@@ -31,27 +32,26 @@ print('Finished aggregating data.')
 
 register_page(__name__, name='State Map', path='/')
 
-layout = html.Div([
-    html.Header(
-        html.H1("State Map", style={'text-align': 'center', 'padding': '10px'}),
-    ),
-
-    # Variable selector and Year slider
-    html.Div(
-        [
-            html.Div(
-                [
-                    dcc.RadioItems(
+layout = dbc.Container(
+    [
+        dbc.Row(
+            [
+                dbc.Col(
+                    html.Div('Select variable:', className='dropdown-label'),
+                    width=1
+                ),
+                dbc.Col(
+                    dcc.Dropdown(
                         id='variable-selector',
                         options=state_variable_mappings,
                         value='Average Income',
-                        labelStyle={'display': 'inline-block', 'margin-right': '100px',}
                     ),
-                ],
-                style={'width': '48%', 'display': 'inline-block', 'padding': '20px'}
-            ),
-            html.Div(
-                [
+                    width=2
+                ),
+                dbc.Col(
+                    html.Div('Select year:', className='form-label'),
+                ),
+                dbc.Col(
                     dcc.Slider(
                         id='year-slider',
                         min=2012,
@@ -60,25 +60,26 @@ layout = html.Div([
                         value=2012,
                         marks={str(year): str(year) for year in range(2012, 2023)},
                     ),
-                ],
-                style={'width': '48%', 'display': 'inline-block', 'padding': '20px'}
-            )
-        ],
-        style={'display': 'flex', 'justify-content': 'center', 'flex-wrap': 'wrap'}
-    ),
-
-    # Graphs layout
-    html.Div(
-        [
-            html.Div(
-                dcc.Graph(id='choropleth-map', style={'height': '500px'}),
-                style={'width': '48%', 'display': 'inline-block', 'padding': '20px','flex-grow': '1'}
-            ),
-        ],
-        style={'display': 'flex', 'justify-content': 'space-between', 'align-items': 'center'}
-    )
-
-])
+                    width=10,
+                ),
+            ],
+            className='align-items-center g-3',
+        ),
+        dbc.Row(
+            [
+                dbc.Col(
+                    dcc.Graph(
+                        id='choropleth-map',
+                        style={'height': '500px'},
+                    ),
+                    width=8
+                )
+            ],
+            className='mb-4'
+        )
+    ],
+    fluid=True
+)
 
 @callback(
     [Output('choropleth-map', 'figure')],

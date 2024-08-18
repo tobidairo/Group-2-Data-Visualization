@@ -40,7 +40,27 @@ def weighted_median_interpolated(df, value_col, weight_col='wt'):
         return lower_value + fraction
 
 def weighted_frequency(df, value_col, weight_col='wt'):
-    return df.groupby(value_col)[weight_col].sum()
+    """
+    Calculate weighted frequencies for given value columns using a specified weight column.
+
+    Parameters:
+    df (pd.DataFrame): The DataFrame containing the data.
+    value_col (list): The columns to group by (e.g., [demographic, y_variable]).
+    weight_col (str): The name of the column containing the weights.
+
+    Returns:
+    pd.DataFrame: A DataFrame with weighted frequencies.
+    """
+
+    try:
+        # Perform groupby and calculate the sum of weights
+        grouped_df = df.groupby(value_col)[weight_col].sum().reset_index()
+    except Exception as e:
+        print(f"Error during groupby operation: {e}")
+        return None  # Return None to indicate failure
+
+    return grouped_df
+
 
 def aggregate_weighted_frequency(df, groupby_cols, value_col, weight_col='wt'):
     result = df.groupby(groupby_cols).apply(lambda x: weighted_frequency(x, value_col, weight_col).reset_index())
@@ -427,3 +447,258 @@ def update_frequency_chart(selected_year, selected_variable, df):
     )
 
     return f"Selected variable: {selected_variable}", frequency_chart
+
+def filter_and_prepare_data(df, year, demographic, y_variable):
+    """
+    Filters the DataFrame by the selected year and demographic variable, then calculates
+    the weighted frequency for the y_variable, preparing the data for plotting a clustered column chart.
+
+    Parameters:
+    df (pd.DataFrame): The input DataFrame containing survey data.
+    year (int): The selected year to filter the data.
+    demographic (str): The demographic column to group by (e.g., 'age', 'sex', 'race').
+    y_variable (str): The y-axis variable to calculate the weighted frequency for (e.g., 'smoking', 'exercise').
+
+    Returns:
+    pd.DataFrame: A DataFrame ready for plotting, with columns for the demographic, y_variable,
+                  the weighted frequency, and the percentage of total responses.
+    """
+
+    # Filter the DataFrame by the selected year
+    df_filtered = df[df['year'] == year]   
+
+    # Calculate weighted frequency for the y_variable grouped by the demographic
+    freq_df = weighted_frequency(df_filtered, [demographic, y_variable])
+
+    # Calculate total weighted frequency for each demographic category
+    total_freq = freq_df.groupby(demographic)['wt'].sum().reset_index()
+    total_freq.rename(columns={'wt': 'total_wt'}, inplace=True)
+
+    # Merge to calculate percentage of total for each y_variable category within each demographic group
+    merged_df = pd.merge(freq_df, total_freq, on=demographic)
+    merged_df['percentage'] = (merged_df['wt'] / merged_df['total_wt']) * 100
+
+    # Prepare the DataFrame for plotting
+    plot_df = merged_df[[demographic, y_variable, 'wt', 'percentage']].copy()
+    plot_df.rename(columns={'wt': 'frequency'}, inplace=True)
+
+    return plot_df
+
+def update_anthro_fig(df, selected_year, demographic, anthro_var):
+    """
+    Generates the figure for the Anthropometrics & Clinical Measures graph.
+
+    Parameters:
+    df (pd.DataFrame): The input DataFrame containing survey data.
+    selected_year (int): The year selected by the user.
+    demographic (str): The demographic variable selected by the user (e.g., 'age', 'sex').
+    anthro_var (str): The specific anthropometric variable to plot (e.g., 'bmi_category').
+
+    Returns:
+    plotly.graph_objs._figure.Figure: A Plotly figure for the Anthropometrics & Clinical Measures.
+    """
+    # Prepare data
+    plot_df = filter_and_prepare_data(df, selected_year, demographic, anthro_var)
+    
+    # Get the mapping dictionaries for demographic and anthro_var
+    demographic_mapping = get_mapping_dict(demographic)
+    anthro_mapping = get_mapping_dict(anthro_var)
+    
+    # Apply the mappings
+    plot_df[demographic] = plot_df[demographic].map(demographic_mapping)
+    plot_df[anthro_var] = plot_df[anthro_var].map(anthro_mapping)
+    
+    # Generate Plotly bar chart
+    fig = px.bar(
+        plot_df,
+        x=demographic,
+        y='percentage',
+        color=anthro_var,
+        text='frequency',
+        barmode='group',
+        title=f'{anthro_var} by {demographic} ({selected_year})'
+    )
+    
+    fig.update_layout(
+        yaxis_title='Percentage of Total Responses',
+        xaxis_title=demographic,
+        uniformtext_minsize=8, uniformtext_mode='hide'
+    )
+    
+    return fig
+
+
+def update_chronic_fig(df, selected_year, demographic, chronic_var):
+    """
+    Generates the figure for the Chronic Conditions graph.
+
+    Parameters:
+    df (pd.DataFrame): The input DataFrame containing survey data.
+    selected_year (int): The year selected by the user.
+    demographic (str): The demographic variable selected by the user (e.g., 'age', 'sex').
+    chronic_var (str): The specific chronic condition variable to plot (e.g., 'asthma').
+
+    Returns:
+    plotly.graph_objs._figure.Figure: A Plotly figure for the Chronic Conditions.
+    """
+    # Prepare data
+    plot_df = filter_and_prepare_data(df, selected_year, demographic, chronic_var)
+    
+    # Get the mapping dictionaries for demographic and chronic_var
+    demographic_mapping = get_mapping_dict(demographic)
+    chronic_mapping = get_mapping_dict(chronic_var)
+    
+    # Apply the mappings
+    plot_df[demographic] = plot_df[demographic].map(demographic_mapping)
+    plot_df[chronic_var] = plot_df[chronic_var].map(chronic_mapping)
+    
+    # Generate Plotly bar chart
+    fig = px.bar(
+        plot_df,
+        x=demographic,
+        y='percentage',
+        color=chronic_var,
+        text='frequency',
+        barmode='group',
+        title=f'{chronic_var} by {demographic} ({selected_year})'
+    )
+    
+    fig.update_layout(
+        yaxis_title='Percentage of Total Responses',
+        xaxis_title=demographic,
+        uniformtext_minsize=8, uniformtext_mode='hide'
+    )
+    
+    return fig
+
+
+def update_access_fig(df, selected_year, demographic, access_var):
+    """
+    Generates the figure for the Healthcare Access graph.
+
+    Parameters:
+    df (pd.DataFrame): The input DataFrame containing survey data.
+    selected_year (int): The year selected by the user.
+    demographic (str): The demographic variable selected by the user (e.g., 'age', 'sex').
+    access_var (str): The specific healthcare access variable to plot (e.g., 'health_insurance').
+
+    Returns:
+    plotly.graph_objs._figure.Figure: A Plotly figure for Healthcare Access.
+    """
+    # Prepare data
+    plot_df = filter_and_prepare_data(df, selected_year, demographic, access_var)
+    
+    # Get the mapping dictionaries for demographic and access_var
+    demographic_mapping = get_mapping_dict(demographic)
+    access_mapping = get_mapping_dict(access_var)
+    
+    # Apply the mappings
+    plot_df[demographic] = plot_df[demographic].map(demographic_mapping)
+    plot_df[access_var] = plot_df[access_var].map(access_mapping)
+    
+    # Generate Plotly bar chart
+    fig = px.bar(
+        plot_df,
+        x=demographic,
+        y='percentage',
+        color=access_var,
+        text='frequency',
+        barmode='group',
+        title=f'{access_var} by {demographic} ({selected_year})'
+    )
+    
+    fig.update_layout(
+        yaxis_title='Percentage of Total Responses',
+        xaxis_title=demographic,
+        uniformtext_minsize=8, uniformtext_mode='hide'
+    )
+    
+    return fig
+
+
+def update_health_fig(df, selected_year, demographic, health_var):
+    """
+    Generates the figure for the Health Measures graph.
+
+    Parameters:
+    df (pd.DataFrame): The input DataFrame containing survey data.
+    selected_year (int): The year selected by the user.
+    demographic (str): The demographic variable selected by the user (e.g., 'age', 'sex').
+    health_var (str): The specific health measure variable to plot (e.g., 'blood_pressure').
+
+    Returns:
+    plotly.graph_objs._figure.Figure: A Plotly figure for Health Measures.
+    """
+    # Prepare data
+    plot_df = filter_and_prepare_data(df, selected_year, demographic, health_var)
+    
+    # Get the mapping dictionaries for demographic and health_var
+    demographic_mapping = get_mapping_dict(demographic)
+    health_mapping = get_mapping_dict(health_var)
+    
+    # Apply the mappings
+    plot_df[demographic] = plot_df[demographic].map(demographic_mapping)
+    plot_df[health_var] = plot_df[health_var].map(health_mapping)
+    
+    # Generate Plotly bar chart
+    fig = px.bar(
+        plot_df,
+        x=demographic,
+        y='percentage',
+        color=health_var,
+        text='frequency',
+        barmode='group',
+        title=f'{health_var} by {demographic} ({selected_year})'
+    )
+    
+    fig.update_layout(
+        yaxis_title='Percentage of Total Responses',
+        xaxis_title=demographic,
+        uniformtext_minsize=8, uniformtext_mode='hide'
+    )
+    
+    return fig
+
+
+def update_lifestyle_fig(df, selected_year, demographic, lifestyle_var):
+    """
+    Generates the figure for the Lifestyle graph.
+
+    Parameters:
+    df (pd.DataFrame): The input DataFrame containing survey data.
+    selected_year (int): The year selected by the user.
+    demographic (str): The demographic variable selected by the user (e.g., 'age', 'sex').
+    lifestyle_var (str): The specific lifestyle variable to plot (e.g., 'smoking').
+
+    Returns:
+    plotly.graph_objs._figure.Figure: A Plotly figure for Lifestyle.
+    """
+    # Prepare data
+    plot_df = filter_and_prepare_data(df, selected_year, demographic, lifestyle_var)
+    
+    # Get the mapping dictionaries for demographic and lifestyle_var
+    demographic_mapping = get_mapping_dict(demographic)
+    lifestyle_mapping = get_mapping_dict(lifestyle_var)
+    
+    # Apply the mappings
+    plot_df[demographic] = plot_df[demographic].map(demographic_mapping)
+    plot_df[lifestyle_var] = plot_df[lifestyle_var].map(lifestyle_mapping)
+    
+    # Generate Plotly bar chart
+    fig = px.bar(
+        plot_df,
+        x=demographic,
+        y='percentage',
+        color=lifestyle_var,
+        text='frequency',
+        barmode='group',
+        title=f'{lifestyle_var} by {demographic} ({selected_year})'
+    )
+    
+    fig.update_layout(
+        yaxis_title='Percentage of Total Responses',
+        xaxis_title=demographic,
+        uniformtext_minsize=8, uniformtext_mode='hide'
+    )
+    
+    return fig
