@@ -14,6 +14,38 @@ register_page(__name__, name='Demographics', path='/demographics')
 
 layout = dbc.Container(
     [
+        # Instructions
+        dbc.Row(
+            dbc.Col(
+                html.Div(
+                    [
+                        html.H5("How to Use the Graphs"),
+                        html.P(
+                            "At the top of the page, you can select a demographic variable and a year. "
+                            "These selections will apply to all graphs below. "
+                            "Each graph represents a different category: Anthropometric and Clinical Measures, Chronic Conditions, Health Measures, Lifestyle, and Healthcare Access. "
+                            "You can further refine each graph by selecting additional variables specific to that category."
+                        ),
+                        html.P(
+                            "To interact with the graphs, use the legend:"
+                        ),
+                        html.Ul(
+                            [
+                                html.Li("Double-click on a legend item to isolate and view only that category."),
+                                html.Li("Single-click on a legend item to exclude that category from the graph."),
+                            ]
+                        ),
+                        html.P(
+                            "These interactions will help you explore the data in more detail and understand the distribution across different demographic groups."
+                        )
+                    ],
+                    style={"padding": "20px", "background-color": "#f8f9fa", "border-radius": "5px"}
+                ),
+                width={"size": 12, "offset": 0}
+            ),
+            className="mb-4"
+        ),
+        
         # Top-level Dropdown for Demographic Variable Selection
         dbc.Row(
             dbc.Col(
@@ -49,64 +81,7 @@ layout = dbc.Container(
             justify='center'
         ),
         
-        # Row for First Two Graphs
-        dbc.Row(
-            [
-                dbc.Col(
-                    [
-                        html.Div('Anthropometrics & Clinical Measures', className='form-label'),
-                        dcc.Dropdown(
-                            id='anthropometrics-selector',
-                            options=anthropometric_variable_mappings,  # Replace with your actual options
-                            value='bmi_category',  # Default value
-                            clearable=False,
-                            className='mb-2'
-                        ),
-                        dcc.Graph(id='graph-anthropometrics', style={'height': '400px'}),
-                        html.Div(id='explanation-anthropometrics', className='text-muted mt-2')
-                    ],
-                    width=6
-                ),
-                dbc.Col(
-                    [
-                        html.Div('Chronic Conditions', className='form-label'),
-                        dcc.Dropdown(
-                            id='chronic-conditions-selector',
-                            options=chronic_condition_variable_mappings,  # Replace with your actual options
-                            value='asthma',  # Default value
-                            clearable=False,
-                            className='mb-2'
-                        ),
-                        dcc.Graph(id='graph-chronic-conditions', style={'height': '400px'}),
-                        html.Div(id='explanation-chronic-conditions', className='text-muted mt-2')
-                    ],
-                    width=6
-                ),
-            ],
-            className='mb-4'
-        ),
-        
-        # Centered Fifth Graph
-        dbc.Row(
-            dbc.Col(
-                [
-                    html.Div('Healthcare Access', className='form-label'),
-                    dcc.Dropdown(
-                        id='healthcare-access-selector',
-                        options=healthcare_access_variable_mappings,  # Replace with your actual options
-                        value='health_insurance',  # Default value
-                        clearable=False,
-                        className='mb-2'
-                    ),
-                    dcc.Graph(id='graph-healthcare-access', style={'height': '400px'}),
-                    html.Div(id='explanation-healthcare-access', className='text-muted mt-2')
-                ],
-                width=8,
-                className='mx-auto mb-4'
-            ),
-        ),
-        
-        # Row for Last Two Graphs
+         # Row for First Two Graphs
         dbc.Row(
             [
                 dbc.Col(
@@ -142,6 +117,64 @@ layout = dbc.Container(
             ],
             className='mb-4'
         ),
+
+        # Row for Next Two Graphs
+        dbc.Row(
+            [
+                dbc.Col(
+                    [
+                        html.Div('Chronic Conditions', className='form-label'),
+                        dcc.Dropdown(
+                            id='chronic-conditions-selector',
+                            options=chronic_condition_variable_mappings,  # Replace with your actual options
+                            value='asthma',  # Default value
+                            clearable=False,
+                            className='mb-2'
+                        ),
+                        dcc.Graph(id='graph-chronic-conditions', style={'height': '400px'}),
+                        html.Div(id='explanation-chronic-conditions', className='text-muted mt-2')
+                    ],
+                    width=6
+                ),
+                dbc.Col(
+                    [
+                        html.Div('Healthcare Access', className='form-label'),
+                        dcc.Dropdown(
+                            id='healthcare-access-selector',
+                            options=healthcare_access_variable_mappings,  # Replace with your actual options
+                            value='health_insurance',  # Default value
+                            clearable=False,
+                            className='mb-2'
+                        ),
+                        dcc.Graph(id='graph-healthcare-access', style={'height': '400px'}),
+                        html.Div(id='explanation-healthcare-access', className='text-muted mt-2')
+                    ],
+                    width=6,
+                    className='mx-auto mb-4'
+                ),
+            ],
+            className='mb-4'
+        ),
+        
+        # Centred Last Graph
+        dbc.Row(
+            dbc.Col(
+                    [
+                        html.Div('Anthropometrics & Clinical Measures', className='form-label'),
+                        dcc.Dropdown(
+                            id='anthropometrics-selector',
+                            options=anthropometric_variable_mappings,  # Replace with your actual options
+                            value='bmi_category',  # Default value
+                            clearable=False,
+                            className='mb-2'
+                        ),
+                        dcc.Graph(id='graph-anthropometrics', style={'height': '400px'}),
+                        html.Div(id='explanation-anthropometrics', className='text-muted mt-2')
+                    ],
+                    width=6
+                ),
+        ),
+
     ],
     fluid=True
 )

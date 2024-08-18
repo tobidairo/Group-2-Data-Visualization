@@ -1,6 +1,8 @@
 import numpy as np
 import pandas as pd
 import plotly.express as px
+from mappings import title_dictionary
+import random
 
 
 def weighted_mean(df, value_col, weight_col):
@@ -175,7 +177,7 @@ def get_mapping_dict(selected_variable):
         return {
             1: 'Attempted to quit smoking in past 12 months',
             2: 'Have not attempted',
-            -1: 'Other'
+            -1: 'Never Smoked / Other'
         }
 
     elif selected_variable == 'bmi_category':
@@ -323,14 +325,14 @@ def get_mapping_dict(selected_variable):
         return {
             1: 'Over 65 who have had a flu jab in the past year',
             2: 'Over 65 who have not had a flu jab in past year',
-            -1: 'Other'
+            -1: 'Under 65 / Other'
         }
 
     elif selected_variable == 'pneumonia_jab':
         return {
             1: 'Over 65 who have had a pneumonia jab in past year',
             2: 'Over 65 who have not had a pneumonia jab in past year',
-            -1: 'Other'
+            -1: 'Under 65 / Other'
         }
 
     elif selected_variable == 'aids_test':
@@ -482,6 +484,9 @@ def filter_and_prepare_data(df, year, demographic, y_variable):
     plot_df = merged_df[[demographic, y_variable, 'wt', 'percentage']].copy()
     plot_df.rename(columns={'wt': 'frequency'}, inplace=True)
 
+    plot_df['percentage'] = plot_df['percentage'].round(1)  # Round percentage to 1 decimal place
+    plot_df['formatted_frequency'] = (plot_df['frequency'] / 1e6).round(2).astype(str) + 'M'  # Convert to millions and format to 2 decimals
+
     return plot_df
 
 def update_anthro_fig(df, selected_year, demographic, anthro_var):
@@ -514,14 +519,27 @@ def update_anthro_fig(df, selected_year, demographic, anthro_var):
         x=demographic,
         y='percentage',
         color=anthro_var,
-        text='frequency',
+        text='formatted_frequency',
         barmode='group',
-        title=f'{anthro_var} by {demographic} ({selected_year})'
+        title=f'{title_dictionary[anthro_var]} by {title_dictionary[demographic]} ({selected_year})',
+        color_discrete_sequence=randomize_colors(px.colors.qualitative.Set3),
+            labels={
+            "formatted_frequency": "Frequency",
+            "percentage": "Percentage",
+            demographic: title_dictionary[demographic],
+            anthro_var: title_dictionary[anthro_var]
+        },
     )
     
     fig.update_layout(
-        yaxis_title='Percentage of Total Responses',
-        xaxis_title=demographic,
+        template='plotly_dark',
+        plot_bgcolor='white',  # Set plot area background to white
+        paper_bgcolor='rgba(0,0,0,0)',  # Keep the outer background transparent (or dark)
+        font=dict(color='white'),  # Ensure text is visible on the white background
+        xaxis=dict(showgrid=False),  # Optional: light gridlines
+        yaxis=dict(showgrid=True, gridcolor='LightGray'),
+        yaxis_title='Percentage of Demographic Group',
+        xaxis_title=title_dictionary[demographic],
         uniformtext_minsize=8, uniformtext_mode='hide'
     )
     
@@ -558,14 +576,27 @@ def update_chronic_fig(df, selected_year, demographic, chronic_var):
         x=demographic,
         y='percentage',
         color=chronic_var,
-        text='frequency',
+        text='formatted_frequency',
         barmode='group',
-        title=f'{chronic_var} by {demographic} ({selected_year})'
+        title=f'{title_dictionary[chronic_var]} by {title_dictionary[demographic]} ({selected_year})',
+        color_discrete_sequence=randomize_colors(px.colors.qualitative.Set3),
+            labels={
+            "formatted_frequency": "Frequency",
+            "percentage": "Percentage",
+            demographic: title_dictionary[demographic],
+            chronic_var: title_dictionary[chronic_var]
+        },
     )
     
     fig.update_layout(
-        yaxis_title='Percentage of Total Responses',
-        xaxis_title=demographic,
+        template='plotly_dark',
+        plot_bgcolor='white',  # Set plot area background to white
+        paper_bgcolor='rgba(0,0,0,0)',  # Keep the outer background transparent (or dark)
+        font=dict(color='white'),  # Ensure text is visible on the white background
+        xaxis=dict(showgrid=False),  # Optional: light gridlines
+        yaxis=dict(showgrid=True, gridcolor='LightGray'),
+        yaxis_title='Percentage of Demographic Group',
+        xaxis_title=title_dictionary[demographic],
         uniformtext_minsize=8, uniformtext_mode='hide'
     )
     
@@ -602,14 +633,27 @@ def update_access_fig(df, selected_year, demographic, access_var):
         x=demographic,
         y='percentage',
         color=access_var,
-        text='frequency',
+        text='formatted_frequency',
         barmode='group',
-        title=f'{access_var} by {demographic} ({selected_year})'
+        title=f'{title_dictionary[access_var]} by {title_dictionary[demographic]} ({selected_year})',
+        color_discrete_sequence=randomize_colors(px.colors.qualitative.Set3),
+            labels={
+            "formatted_frequency": "Frequency",
+            "percentage": "Percentage",
+            demographic: title_dictionary[demographic],
+            access_var: title_dictionary[access_var]
+        },
     )
     
     fig.update_layout(
-        yaxis_title='Percentage of Total Responses',
-        xaxis_title=demographic,
+        template='plotly_dark',
+        plot_bgcolor='white',  # Set plot area background to white
+        paper_bgcolor='rgba(0,0,0,0)',  # Keep the outer background transparent (or dark)
+        font=dict(color='white'),  # Ensure text is visible on the white background
+        xaxis=dict(showgrid=False),  # Optional: light gridlines
+        yaxis=dict(showgrid=True, gridcolor='LightGray'),
+        yaxis_title='Percentage of Demographic Group',
+        xaxis_title=title_dictionary[demographic],
         uniformtext_minsize=8, uniformtext_mode='hide'
     )
     
@@ -646,14 +690,27 @@ def update_health_fig(df, selected_year, demographic, health_var):
         x=demographic,
         y='percentage',
         color=health_var,
-        text='frequency',
+        text='formatted_frequency',
         barmode='group',
-        title=f'{health_var} by {demographic} ({selected_year})'
+        title=f'{title_dictionary[health_var]} by {title_dictionary[demographic]} ({selected_year})',
+        color_discrete_sequence=randomize_colors(px.colors.qualitative.Set3),
+            labels={
+            "formatted_frequency": "Frequency",
+            "percentage": "Percentage",
+            demographic: title_dictionary[demographic],
+            health_var: title_dictionary[health_var]
+        },
     )
     
     fig.update_layout(
-        yaxis_title='Percentage of Total Responses',
-        xaxis_title=demographic,
+        template='plotly_dark',
+        plot_bgcolor='white',  # Set plot area background to white
+        paper_bgcolor='rgba(0,0,0,0)',  # Keep the outer background transparent (or dark)
+        font=dict(color='white'),  # Ensure text is visible on the white background
+        xaxis=dict(showgrid=False),  # Optional: light gridlines
+        yaxis=dict(showgrid=True, gridcolor='LightGray'),
+        yaxis_title='Percentage of Demographic Group',
+        xaxis_title=title_dictionary[demographic],
         uniformtext_minsize=8, uniformtext_mode='hide'
     )
     
@@ -690,15 +747,42 @@ def update_lifestyle_fig(df, selected_year, demographic, lifestyle_var):
         x=demographic,
         y='percentage',
         color=lifestyle_var,
-        text='frequency',
+        text='formatted_frequency',
         barmode='group',
-        title=f'{lifestyle_var} by {demographic} ({selected_year})'
+        title=f'{title_dictionary[lifestyle_var]} by {title_dictionary[demographic]} ({selected_year})',
+        color_discrete_sequence=randomize_colors(px.colors.qualitative.Set3),
+            labels={
+            "formatted_frequency": "Frequency",
+            "percentage": "Percentage",
+            demographic: title_dictionary[demographic],
+            lifestyle_var: title_dictionary[lifestyle_var]
+        },
     )
     
     fig.update_layout(
-        yaxis_title='Percentage of Total Responses',
-        xaxis_title=demographic,
+        template='plotly_dark',
+        plot_bgcolor='white',  # Set plot area background to white
+        paper_bgcolor='rgba(0,0,0,0)',  # Keep the outer background transparent (or dark)
+        font=dict(color='white'),  # Ensure text is visible on the white background
+        xaxis=dict(showgrid=False),  # Optional: light gridlines
+        yaxis=dict(showgrid=True, gridcolor='LightGray'),
+        yaxis_title='Percentage of Demographic Group',
+        xaxis_title=title_dictionary[demographic],
         uniformtext_minsize=8, uniformtext_mode='hide'
     )
     
     return fig
+
+def randomize_colors(color_sequence):
+    """
+    Randomizes the order of a given color sequence.
+    
+    Parameters:
+        color_sequence (list): A list of color hex codes or names.
+    
+    Returns:
+        list: A randomized list of the color sequence.
+    """
+    randomized_sequence = color_sequence.copy()  # Copy the original sequence
+    random.shuffle(randomized_sequence)  # Randomize the order
+    return randomized_sequence

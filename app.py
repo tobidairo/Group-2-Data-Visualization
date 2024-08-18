@@ -54,8 +54,23 @@ navbar = dbc.Navbar(
 footer = dbc.Container(
     dbc.Row(
         [
-            dbc.Col(html.A("GitHub", href='/'), align='left'),
+            dbc.Col(
+                dbc.Button("Home", href='/', color='primary', className='mr-2'),
+                align='left',
+                width='auto'
+            ),
+            dbc.Col(
+                dbc.Button("Back to Top", href='#', color='secondary', className='mr-2'),
+                align='center',
+                width='auto'
+            ),
+            dbc.Col(
+                html.A("GitHub", href='/'),
+                align='right',
+                width='auto'
+            )
         ],
+        justify='between'  # Space out columns evenly
     ),
     className='footer',
     fluid=True
