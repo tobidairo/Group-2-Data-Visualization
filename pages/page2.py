@@ -33,7 +33,7 @@ layout = dbc.Container(
                     min=2012,
                     max=2022,
                     step=1,
-                    value=2012,
+                    value=2022,
                     marks={str(year): str(year) for year in range(2012, 2023)},
                 ),
                 width=8,
