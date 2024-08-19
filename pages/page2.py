@@ -29,7 +29,7 @@ layout = dbc.Container(
         dbc.Row(
             dbc.Col(
                 dcc.Slider(
-                    id='year-slider-2',
+                    id='year-slider-summary',
                     min=2012,
                     max=2022,
                     step=1,
@@ -50,15 +50,15 @@ layout = dbc.Container(
                             options=population_dropdown_mappings,
                             value='age',
                             placeholder='Select a variable',
-                            id='variable-selector-2'
+                            id='variable-selector-summary'
                         ),
-                        html.Div(id='dd-output-container-2')
+                        html.Div(id='dd-output-container-summary')
                     ],
                     width=2,
                 ),
                 dbc.Col(
                     dcc.Graph(
-                        id='frequency-chart',
+                        id='frequency-chart-summary',
                         style={'height': '500px'},
                     ),
                     width=8,
@@ -72,10 +72,10 @@ layout = dbc.Container(
 
 
 @callback(
-    [Output('dd-output-container-2', 'children'),
-     Output('frequency-chart', 'figure')],
-    [Input('year-slider-2', 'value'),
-     Input('variable-selector-2', 'value')]
+    [Output('dd-output-container-summary', 'children'),
+     Output('frequency-chart-summary', 'figure')],
+    [Input('year-slider-summary', 'value'),
+     Input('variable-selector-summary', 'value')]
 )
 
 def update_plots(selected_year, selected_variable):

@@ -489,7 +489,7 @@ def filter_and_prepare_data(df, year, demographic, y_variable):
 
     return plot_df
 
-def update_anthro_fig(df, selected_year, demographic, anthro_var):
+def update_dem_anthro_fig(df, selected_year, demographic, anthro_var):
     """
     Generates the figure for the Anthropometrics & Clinical Measures graph.
 
@@ -546,7 +546,7 @@ def update_anthro_fig(df, selected_year, demographic, anthro_var):
     return fig
 
 
-def update_chronic_fig(df, selected_year, demographic, chronic_var):
+def update_dem_chronic_fig(df, selected_year, demographic, chronic_var):
     """
     Generates the figure for the Chronic Conditions graph.
 
@@ -603,7 +603,7 @@ def update_chronic_fig(df, selected_year, demographic, chronic_var):
     return fig
 
 
-def update_access_fig(df, selected_year, demographic, access_var):
+def update_dem_access_fig(df, selected_year, demographic, access_var):
     """
     Generates the figure for the Healthcare Access graph.
 
@@ -660,7 +660,7 @@ def update_access_fig(df, selected_year, demographic, access_var):
     return fig
 
 
-def update_health_fig(df, selected_year, demographic, health_var):
+def update_dem_health_fig(df, selected_year, demographic, health_var):
     """
     Generates the figure for the Health Measures graph.
 
@@ -717,7 +717,7 @@ def update_health_fig(df, selected_year, demographic, health_var):
     return fig
 
 
-def update_lifestyle_fig(df, selected_year, demographic, lifestyle_var):
+def update_dem_lifestyle_fig(df, selected_year, demographic, lifestyle_var):
     """
     Generates the figure for the Lifestyle graph.
 
@@ -786,3 +786,179 @@ def randomize_colors(color_sequence):
     randomized_sequence = color_sequence.copy()  # Copy the original sequence
     random.shuffle(randomized_sequence)  # Randomize the order
     return randomized_sequence
+
+def update_life_health_fig(df, selected_year, lifestyle, health_var):
+        # Prepare data
+    plot_df = filter_and_prepare_data(df, selected_year, lifestyle, health_var)
+    
+    # Get the mapping dictionaries for lifestyle and health_var
+    lifestyle_mapping = get_mapping_dict(lifestyle)
+    health_mapping = get_mapping_dict(health_var)
+    
+    # Apply the mappings
+    plot_df[lifestyle] = plot_df[lifestyle].map(lifestyle_mapping)
+    plot_df[health_var] = plot_df[health_var].map(health_mapping)
+    
+    # Generate Plotly bar chart
+    fig = px.bar(
+        plot_df,
+        x=lifestyle,
+        y='percentage',
+        color=health_var,
+        text='formatted_frequency',
+        barmode='group',
+        title=f'{title_dictionary[health_var]} by {title_dictionary[lifestyle]} ({selected_year})',
+        color_discrete_sequence=randomize_colors(px.colors.qualitative.Set3),
+            labels={
+            "formatted_frequency": "Frequency",
+            "percentage": "Percentage",
+            lifestyle: title_dictionary[lifestyle],
+            health_var: title_dictionary[health_var]
+        },
+    )
+    
+    fig.update_layout(
+        template='plotly_dark',
+        plot_bgcolor='white',  # Set plot area background to white
+        paper_bgcolor='rgba(0,0,0,0)',  # Keep the outer background transparent (or dark)
+        font=dict(color='white'),  # Ensure text is visible on the white background
+        xaxis=dict(showgrid=False),  # Optional: light gridlines
+        yaxis=dict(showgrid=True, gridcolor='LightGray'),
+        yaxis_title='Percentage of Lifestyle Group',
+        xaxis_title=title_dictionary[lifestyle],
+        uniformtext_minsize=8, uniformtext_mode='hide'
+    )
+    
+    return fig
+
+def update_life_anthro_fig(df, selected_year, lifestyle, anthro_var):
+        # Prepare data
+    plot_df = filter_and_prepare_data(df, selected_year, lifestyle, anthro_var)
+    
+    # Get the mapping dictionaries for lifestyle and anthro_var
+    lifestyle_mapping = get_mapping_dict(lifestyle)
+    anthro_mapping = get_mapping_dict(anthro_var)
+    
+    # Apply the mappings
+    plot_df[lifestyle] = plot_df[lifestyle].map(lifestyle_mapping)
+    plot_df[anthro_var] = plot_df[anthro_var].map(anthro_mapping)
+    
+    # Generate Plotly bar chart
+    fig = px.bar(
+        plot_df,
+        x=lifestyle,
+        y='percentage',
+        color=anthro_var,
+        text='formatted_frequency',
+        barmode='group',
+        title=f'{title_dictionary[anthro_var]} by {title_dictionary[lifestyle]} ({selected_year})',
+        color_discrete_sequence=randomize_colors(px.colors.qualitative.Set3),
+            labels={
+            "formatted_frequency": "Frequency",
+            "percentage": "Percentage",
+            lifestyle: title_dictionary[lifestyle],
+            anthro_var: title_dictionary[anthro_var]
+        },
+    )
+    
+    fig.update_layout(
+        template='plotly_dark',
+        plot_bgcolor='white',  # Set plot area background to white
+        paper_bgcolor='rgba(0,0,0,0)',  # Keep the outer background transparent (or dark)
+        font=dict(color='white'),  # Ensure text is visible on the white background
+        xaxis=dict(showgrid=False),  # Optional: light gridlines
+        yaxis=dict(showgrid=True, gridcolor='LightGray'),
+        yaxis_title='Percentage of Lifestyle Group',
+        xaxis_title=title_dictionary[lifestyle],
+        uniformtext_minsize=8, uniformtext_mode='hide'
+    )
+    
+    return fig
+
+def update_life_chronic_fig(df, selected_year, lifestyle, chronic_var):
+        # Prepare data
+    plot_df = filter_and_prepare_data(df, selected_year, lifestyle, chronic_var)
+    
+    # Get the mapping dictionaries for lifestyle and chronic_var
+    lifestyle_mapping = get_mapping_dict(lifestyle)
+    chronic_mapping = get_mapping_dict(chronic_var)
+    
+    # Apply the mappings
+    plot_df[lifestyle] = plot_df[lifestyle].map(lifestyle_mapping)
+    plot_df[chronic_var] = plot_df[chronic_var].map(chronic_mapping)
+    
+    # Generate Plotly bar chart
+    fig = px.bar(
+        plot_df,
+        x=lifestyle,
+        y='percentage',
+        color=chronic_var,
+        text='formatted_frequency',
+        barmode='group',
+        title=f'{title_dictionary[chronic_var]} by {title_dictionary[lifestyle]} ({selected_year})',
+        color_discrete_sequence=randomize_colors(px.colors.qualitative.Set3),
+            labels={
+            "formatted_frequency": "Frequency",
+            "percentage": "Percentage",
+            lifestyle: title_dictionary[lifestyle],
+            chronic_var: title_dictionary[chronic_var]
+        },
+    )
+    
+    fig.update_layout(
+        template='plotly_dark',
+        plot_bgcolor='white',  # Set plot area background to white
+        paper_bgcolor='rgba(0,0,0,0)',  # Keep the outer background transparent (or dark)
+        font=dict(color='white'),  # Ensure text is visible on the white background
+        xaxis=dict(showgrid=False),  # Optional: light gridlines
+        yaxis=dict(showgrid=True, gridcolor='LightGray'),
+        yaxis_title='Percentage of Lifestyle Group',
+        xaxis_title=title_dictionary[lifestyle],
+        uniformtext_minsize=8, uniformtext_mode='hide'
+    )
+    
+    return fig
+
+def update_life_access_fig(df, selected_year, lifestyle, access_var):
+        # Prepare data
+    plot_df = filter_and_prepare_data(df, selected_year, lifestyle, access_var)
+    
+    # Get the mapping dictionaries for lifestyle and access_var
+    lifestyle_mapping = get_mapping_dict(lifestyle)
+    access_mapping = get_mapping_dict(access_var)
+    
+    # Apply the mappings
+    plot_df[lifestyle] = plot_df[lifestyle].map(lifestyle_mapping)
+    plot_df[access_var] = plot_df[access_var].map(access_mapping)
+    
+    # Generate Plotly bar chart
+    fig = px.bar(
+        plot_df,
+        x=lifestyle,
+        y='percentage',
+        color=access_var,
+        text='formatted_frequency',
+        barmode='group',
+        title=f'{title_dictionary[access_var]} by {title_dictionary[lifestyle]} ({selected_year})',
+        color_discrete_sequence=randomize_colors(px.colors.qualitative.Set3),
+            labels={
+            "formatted_frequency": "Frequency",
+            "percentage": "Percentage",
+            lifestyle: title_dictionary[lifestyle],
+            access_var: title_dictionary[access_var]
+        },
+    )
+    
+    fig.update_layout(
+        template='plotly_dark',
+        plot_bgcolor='white',  # Set plot area background to white
+        paper_bgcolor='rgba(0,0,0,0)',  # Keep the outer background transparent (or dark)
+        font=dict(color='white'),  # Ensure text is visible on the white background
+        xaxis=dict(showgrid=False),  # Optional: light gridlines
+        yaxis=dict(showgrid=True, gridcolor='LightGray'),
+        yaxis_title='Percentage of Lifestyle Group',
+        xaxis_title=title_dictionary[lifestyle],
+        uniformtext_minsize=8, uniformtext_mode='hide'
+    )
+    
+    return fig

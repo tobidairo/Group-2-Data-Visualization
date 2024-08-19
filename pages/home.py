@@ -42,7 +42,7 @@ layout = dbc.Container(
                 ),
                 dbc.Col(
                     dcc.Dropdown(
-                        id='variable-selector',
+                        id='variable-selector-state-map',
                         options=state_variable_mappings,
                         value='Average Income',
                     ),
@@ -53,7 +53,7 @@ layout = dbc.Container(
                 ),
                 dbc.Col(
                     dcc.Slider(
-                        id='year-slider',
+                        id='year-slider-state-map',
                         min=2012,
                         max=2022,
                         step=1,
@@ -69,7 +69,7 @@ layout = dbc.Container(
             [
                 dbc.Col(
                     dcc.Graph(
-                        id='choropleth-map',
+                        id='choropleth-map-state-map',
                         style={'height': '500px'},
                     ),
                     width=8
@@ -82,9 +82,9 @@ layout = dbc.Container(
 )
 
 @callback(
-    [Output('choropleth-map', 'figure')],
-    [Input('year-slider', 'value'),
-     Input('variable-selector', 'value')]
+    [Output('choropleth-map-state-map', 'figure')],
+    [Input('year-slider-state-map', 'value'),
+     Input('variable-selector-state-map', 'value')]
 )
 
 def update_plots(selected_year, selected_variable):

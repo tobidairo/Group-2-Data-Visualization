@@ -5,12 +5,11 @@ import dash
 from dash import Dash, dcc, html, register_page, callback
 from dash.dependencies import Input, Output
 import dash_bootstrap_components as dbc
-from mappings import state_mapping, state_variable_mappings, population_dropdown_mappings, lifestyle_variable_mappings, health_measure_variable_mappings, demographic_variable_mappings, anthropometric_variable_mappings, chronic_condition_variable_mappings, healthcare_access_variable_mappings
-from helper_functions import update_dem_access_fig, update_dem_anthro_fig, update_dem_health_fig, update_dem_chronic_fig, update_dem_lifestyle_fig
-from process_data import read_data
+from mappings import lifestyle_variable_mappings, health_measure_variable_mappings, demographic_variable_mappings, anthropometric_variable_mappings, chronic_condition_variable_mappings, healthcare_access_variable_mappings
+from helper_functions import update_life_access_fig, update_life_anthro_fig, update_life_health_fig, update_life_chronic_fig
 from app import df
 
-register_page(__name__, name='Demographics', path='/demographics')
+register_page(__name__, name='Lifestyle', path='/lifestyle')
 
 layout = dbc.Container(
     [
@@ -20,12 +19,12 @@ layout = dbc.Container(
                     [
                         dbc.Button(
                             "How to Use the Graphs", 
-                            id="alert-collapse-button-demographics", 
+                            id="alert-collapse-button-lifestyle", 
                             className="mb-3", 
                             color="primary"
                         ),
                         dbc.Collapse(
-                            id="alert-collapse-section-demographics",
+                            id="alert-collapse-section-lifestyle",
                             is_open=False,
                             children=dbc.Alert(
                                 [
@@ -61,15 +60,15 @@ layout = dbc.Container(
                 className="mb-4"
             ),
         
-        # Top-level Dropdown for Demographic Variable Selection
+        # Top-level Dropdown for Lifestyle Variable Selection
         dbc.Row(
             dbc.Col(
                 [
-                    html.Label('Select Demographic Variable:', className='dropdown-label'),
+                    html.Label('Select Lifestyle Variable:', className='dropdown-label'),
                     dcc.Dropdown(
-                        id='demographic-selector-demographics',
-                        options=demographic_variable_mappings,  # Replace with your actual demographic options
-                        value='age',  # Default value
+                        id='lifestyle-selector-lifestyle',
+                        options=lifestyle_variable_mappings,
+                        value='smoking',  # Default value
                         clearable=False,
                     ),
                 ],
@@ -83,7 +82,7 @@ layout = dbc.Container(
         dbc.Row(
             dbc.Col(
                 dcc.Slider(
-                    id='year-slider-demographics',
+                    id='year-slider-lifestyle',
                     min=2012,
                     max=2022,
                     step=1,
@@ -103,29 +102,29 @@ layout = dbc.Container(
                     [
                         html.Div('Health Measures', className='form-label'),
                         dcc.Dropdown(
-                            id='health-measures-selector-demographics',
-                            options=health_measure_variable_mappings,  # Replace with your actual options
+                            id='health-measures-selector-lifestyle',
+                            options=health_measure_variable_mappings,
                             value='mental_health',  # Default value
                             clearable=False,
                             className='mb-2'
                         ),
-                        dcc.Graph(id='graph-health-measures-demographics', style={'height': '400px'}),
-                        html.Div(id='explanation-health-measures-demographics', className='text-muted mt-2')
+                        dcc.Graph(id='graph-health-measures-lifestyle', style={'height': '400px'}),
+                        html.Div(id='explanation-health-measures-lifestyle', className='text-muted mt-2')
                     ],
                     width=6
                 ),
                 dbc.Col(
                     [
-                        html.Div('Lifestyle', className='form-label'),
+                        html.Div('Anthropometrics & Clinical Measures', className='form-label'),
                         dcc.Dropdown(
-                            id='lifestyle-selector-demographics',
-                            options=lifestyle_variable_mappings,  # Replace with your actual options
-                            value='smoking',  # Default value
+                            id='anthropometrics-selector-lifestyle',
+                            options=anthropometric_variable_mappings,
+                            value='bmi_category',  # Default value
                             clearable=False,
                             className='mb-2'
                         ),
-                        dcc.Graph(id='graph-lifestyle-demographics', style={'height': '400px'}),
-                        html.Div(id='explanation-lifestyle-demographics', className='text-muted mt-2')
+                        dcc.Graph(id='graph-anthropometrics-lifestyle', style={'height': '400px'}),
+                        html.Div(id='explanation-anthropometrics-lifestyle', className='text-muted mt-2')
                     ],
                     width=6
                 ),
@@ -140,14 +139,14 @@ layout = dbc.Container(
                     [
                         html.Div('Chronic Conditions', className='form-label'),
                         dcc.Dropdown(
-                            id='chronic-conditions-selector-demographics',
-                            options=chronic_condition_variable_mappings,  # Replace with your actual options
+                            id='chronic-conditions-selector-lifestyle',
+                            options=chronic_condition_variable_mappings,
                             value='asthma',  # Default value
                             clearable=False,
                             className='mb-2'
                         ),
-                        dcc.Graph(id='graph-chronic-conditions-demographics', style={'height': '400px'}),
-                        html.Div(id='explanation-chronic-conditions-demographics', className='text-muted mt-2')
+                        dcc.Graph(id='graph-chronic-conditions-lifestyle', style={'height': '400px'}),
+                        html.Div(id='explanation-chronic-conditions-lifestyle', className='text-muted mt-2')
                     ],
                     width=6
                 ),
@@ -155,14 +154,14 @@ layout = dbc.Container(
                     [
                         html.Div('Healthcare Access', className='form-label'),
                         dcc.Dropdown(
-                            id='healthcare-access-selector-demographics',
-                            options=healthcare_access_variable_mappings,  # Replace with your actual options
+                            id='healthcare-access-selector-lifestyle',
+                            options=healthcare_access_variable_mappings,
                             value='health_insurance',  # Default value
                             clearable=False,
                             className='mb-2'
                         ),
-                        dcc.Graph(id='graph-healthcare-access-demographics', style={'height': '400px'}),
-                        html.Div(id='explanation-healthcare-access-demographics', className='text-muted mt-2')
+                        dcc.Graph(id='graph-healthcare-access-lifestyle', style={'height': '400px'}),
+                        html.Div(id='explanation-healthcare-access-lifestyle', className='text-muted mt-2')
                     ],
                     width=6,
                     className='mx-auto mb-4'
@@ -170,26 +169,6 @@ layout = dbc.Container(
             ],
             className='mb-4'
         ),
-        
-        # Centred Last Graph
-        dbc.Row(
-            dbc.Col(
-                    [
-                        html.Div('Anthropometrics & Clinical Measures', className='form-label'),
-                        dcc.Dropdown(
-                            id='anthropometrics-selector-demographics',
-                            options=anthropometric_variable_mappings,  # Replace with your actual options
-                            value='bmi_category',  # Default value
-                            clearable=False,
-                            className='mb-2'
-                        ),
-                        dcc.Graph(id='graph-anthropometrics-demographics', style={'height': '400px'}),
-                        html.Div(id='explanation-anthropometrics-demographics', className='text-muted mt-2')
-                    ],
-                    width=6
-                ),
-        ),
-
     ],
     fluid=True
 )
@@ -198,38 +177,35 @@ from dash import callback, Output, Input, State
 
 @callback(
     [
-        Output('graph-anthropometrics-demographics', 'figure'),
-        Output('graph-chronic-conditions-demographics', 'figure'),
-        Output('graph-healthcare-access-demographics', 'figure'),
-        Output('graph-health-measures-demographics', 'figure'),
-        Output('graph-lifestyle-demographics', 'figure'),
-        Output('alert-collapse-section-demographics', 'is_open'),  # Add this Output for the alert
+        Output('graph-health-measures-lifestyle', 'figure'),
+        Output('graph-anthropometrics-lifestyle', 'figure'),
+        Output('graph-chronic-conditions-lifestyle', 'figure'),
+        Output('graph-healthcare-access-lifestyle', 'figure'),
+        Output('alert-collapse-section-lifestyle', 'is_open'),  # Add this Output for the alert
     ],
     [
-        Input('demographic-selector-demographics', 'value'),
-        Input('year-slider-demographics', 'value'),
-        Input('anthropometrics-selector-demographics', 'value'),
-        Input('chronic-conditions-selector-demographics', 'value'),
-        Input('healthcare-access-selector-demographics', 'value'),
-        Input('health-measures-selector-demographics', 'value'),
-        Input('lifestyle-selector-demographics', 'value'),
-        Input('alert-collapse-button-demographics', 'n_clicks'),  # Add this Input for the alert button
+        Input('lifestyle-selector-lifestyle', 'value'),
+        Input('year-slider-lifestyle', 'value'),
+        Input('health-measures-selector-lifestyle', 'value'),
+        Input('anthropometrics-selector-lifestyle', 'value'),
+        Input('chronic-conditions-selector-lifestyle', 'value'),
+        Input('healthcare-access-selector-lifestyle', 'value'),
+        Input('alert-collapse-button-lifestyle', 'n_clicks'),  # Add this Input for the alert button
     ],
-    [State('alert-collapse-section-demographics', 'is_open')]  # State to track if the alert is open
+    [State('alert-collapse-section-lifestyle', 'is_open')]  # State to track if the alert is open
 )
-def update_graphs_and_toggle_alert(demographic, selected_year, anthro_var, chronic_var, access_var, health_var, lifestyle_var, n_clicks, is_open):
+def update_graphs_and_toggle_alert(lifestyle, selected_year, health_var, anthro_var, chronic_var, access_var, n_clicks, is_open):
     # Generate each figure using the respective update function
-    fig_anthro = update_dem_anthro_fig(df, selected_year, demographic, anthro_var)
-    fig_chronic = update_dem_chronic_fig(df, selected_year, demographic, chronic_var)
-    fig_access = update_dem_access_fig(df, selected_year, demographic, access_var)
-    fig_health = update_dem_health_fig(df, selected_year, demographic, health_var)
-    fig_lifestyle = update_dem_lifestyle_fig(df, selected_year, demographic, lifestyle_var)
+    fig_health = update_life_health_fig(df, selected_year, lifestyle, health_var)
+    fig_anthro = update_life_anthro_fig(df, selected_year, lifestyle, anthro_var)
+    fig_chronic = update_life_chronic_fig(df, selected_year, lifestyle, chronic_var)
+    fig_access = update_life_access_fig(df, selected_year, lifestyle, access_var)
 
     # Handle the alert collapse functionality
     if n_clicks:
         is_open = not is_open
 
     # Return all figures plus the state of the alert collapse
-    return fig_anthro, fig_chronic, fig_access, fig_health, fig_lifestyle, is_open
+    return fig_health, fig_anthro, fig_chronic, fig_access, is_open
 
 
