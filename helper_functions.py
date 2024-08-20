@@ -450,46 +450,49 @@ def update_frequency_chart(selected_year, selected_variable, df):
 
     return f"Selected variable: {selected_variable}", frequency_chart
 
-def filter_and_prepare_data(df, year, demographic, y_variable):
+def filter_and_prepare_data(df, year=None, demographic=None, y_variable=None):
     """
-    Filters the DataFrame by the selected year and demographic variable, then calculates
-    the weighted frequency for the y_variable, preparing the data for plotting a clustered column chart.
+    Filters the DataFrame by the selected demographic variable, then calculates
+    the weighted frequency for the y_variable, preparing the data for plotting a time series.
 
     Parameters:
     df (pd.DataFrame): The input DataFrame containing survey data.
-    year (int): The selected year to filter the data.
+    year (int or None): The selected year to filter the data. If None, data from all years will be used.
     demographic (str): The demographic column to group by (e.g., 'age', 'sex', 'race').
     y_variable (str): The y-axis variable to calculate the weighted frequency for (e.g., 'smoking', 'exercise').
 
     Returns:
     pd.DataFrame: A DataFrame ready for plotting, with columns for the demographic, y_variable,
-                  the weighted frequency, and the percentage of total responses.
+                  the weighted frequency, and the percentage of total responses across years.
     """
 
-    # Filter the DataFrame by the selected year
-    df_filtered = df[df['year'] == year]   
+    # Filter the DataFrame by the selected year if specified, otherwise include all years
+    if year:
+        df_filtered = df[df['year'] == year]
+    else:
+        df_filtered = df.copy()
 
-    # Calculate weighted frequency for the y_variable grouped by the demographic
-    freq_df = weighted_frequency(df_filtered, [demographic, y_variable])
+    # Calculate weighted frequency for the y_variable grouped by the demographic and year
+    freq_df = df_filtered.groupby(['year', demographic, y_variable])['wt'].sum().reset_index()
 
-    # Calculate total weighted frequency for each demographic category
-    total_freq = freq_df.groupby(demographic)['wt'].sum().reset_index()
+    # Calculate total weighted frequency for each demographic category within each year
+    total_freq = freq_df.groupby(['year', demographic])['wt'].sum().reset_index()
     total_freq.rename(columns={'wt': 'total_wt'}, inplace=True)
 
     # Merge to calculate percentage of total for each y_variable category within each demographic group
-    merged_df = pd.merge(freq_df, total_freq, on=demographic)
+    merged_df = pd.merge(freq_df, total_freq, on=['year', demographic])
     merged_df['percentage'] = (merged_df['wt'] / merged_df['total_wt']) * 100
 
     # Prepare the DataFrame for plotting
-    plot_df = merged_df[[demographic, y_variable, 'wt', 'percentage']].copy()
+    plot_df = merged_df[[demographic, y_variable, 'year', 'wt', 'percentage']].copy()
     plot_df.rename(columns={'wt': 'frequency'}, inplace=True)
 
     plot_df['percentage'] = plot_df['percentage'].round(1)  # Round percentage to 1 decimal place
     plot_df['percentage_text'] = plot_df['percentage'].apply(lambda x: f'{x:.1f}%')
     plot_df['formatted_frequency'] = (plot_df['frequency'] / 1e6).round(2).astype(str) + 'M'  # Convert to millions and format to 2 decimals
 
-
     return plot_df
+
 
 def update_dem_anthro_fig(df, selected_year, demographic, anthro_var):
     """
@@ -504,6 +507,7 @@ def update_dem_anthro_fig(df, selected_year, demographic, anthro_var):
     Returns:
     plotly.graph_objs._figure.Figure: A Plotly figure for the Anthropometrics & Clinical Measures.
     """
+
     # Prepare data
     plot_df = filter_and_prepare_data(df, selected_year, demographic, anthro_var)
     
@@ -991,3 +995,42 @@ def update_life_access_fig(df, selected_year, lifestyle, access_var, weight_col=
     )
     
     return fig
+
+
+def update_time_series(df, selected_variable):
+    """
+    Generates a time series plot based on the selected variable.
+
+    Parameters:
+    df (pd.DataFrame): The input DataFrame containing the survey data.
+    selected_variable (str): The variable selected by the user (e.g., 'sex', 'age', 'exercise').
+
+    Returns:
+    plotly.graph_objs._figure.Figure: A Plotly figure representing the time series.
+    """
+
+    # Correctly pass the selected variable to y_variable
+    time_series_data = filter_and_prepare_data(df, year=None, demographic='age', y_variable=selected_variable)
+
+    # Ensure there is data to plot
+    if time_series_data.empty:
+        return {}
+
+    # Generate the time series plot
+    fig = px.line(
+        time_series_data,
+        x='year',
+        y='frequency',
+        color=selected_variable,  # Color by the selected variable
+        markers=True,
+        title=f'Time Series of {selected_variable.title()} by Age Group (2012-2022)',
+        labels={
+            selected_variable: selected_variable.title(),
+            'percentage': 'Percentage',
+            'year': 'Year'
+        },
+    )
+    fig.update_layout(hovermode='x unified')
+
+    return fig
+

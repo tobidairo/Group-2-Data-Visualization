@@ -30,7 +30,7 @@ aggregated_data = {
 }
 print('Finished aggregating data.')
 
-register_page(__name__, name='State Map', path='/')
+register_page(__name__, name='State Map', path='/statemap')
 
 layout = dbc.Container(
     [

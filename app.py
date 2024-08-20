@@ -10,14 +10,7 @@ import dash_bootstrap_components as dbc
 
 print('Reading data...')
 df = read_data(dtypes)
-
 print('Read data.')
-
-df['state_code'] = df['state'].map(state_mapping)
-
-df['income_midpoint'] = df['income'].map(income_bracket_midpoints)
-
-df['age_midpoint'] = df['age'].map(age_range_midpoints)
 
 app = Dash(__name__, use_pages=True, external_stylesheets=[dbc.themes.SLATE])
 
@@ -27,7 +20,9 @@ navbar = dbc.Navbar(
             dbc.NavbarBrand("Survey Dashboard", href="/"),
             dbc.Nav(
                 [
-                    dbc.NavItem(dbc.NavLink("State Map", href="/")),
+                    dbc.NavItem(dbc.NavLink("Homepage", href="/")),
+                    dbc.NavItem(dbc.NavLink("Overview", href="/overview")),
+                    dbc.NavItem(dbc.NavLink("State Map", href="/statemap")),
                     dbc.NavItem(dbc.NavLink("Summary", href="/summary")),
                     dbc.NavItem(dbc.NavLink("Demographics", href="/demographics")),
                     dbc.NavItem(dbc.NavLink("Lifestyle", href="/lifestyle")),
