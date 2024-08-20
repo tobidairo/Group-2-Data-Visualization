@@ -485,7 +485,9 @@ def filter_and_prepare_data(df, year, demographic, y_variable):
     plot_df.rename(columns={'wt': 'frequency'}, inplace=True)
 
     plot_df['percentage'] = plot_df['percentage'].round(1)  # Round percentage to 1 decimal place
+    plot_df['percentage_text'] = plot_df['percentage'].apply(lambda x: f'{x:.1f}%')
     plot_df['formatted_frequency'] = (plot_df['frequency'] / 1e6).round(2).astype(str) + 'M'  # Convert to millions and format to 2 decimals
+
 
     return plot_df
 
@@ -803,10 +805,10 @@ def update_life_health_fig(df, selected_year, lifestyle, health_var):
     fig = px.bar(
         plot_df,
         x=lifestyle,
-        y='percentage',
+        y='frequency',
         color=health_var,
-        text='formatted_frequency',
-        barmode='group',
+        text='percentage_text',
+        barmode='stack',
         title=f'{title_dictionary[health_var]} by {title_dictionary[lifestyle]} ({selected_year})',
         color_discrete_sequence=randomize_colors(px.colors.qualitative.Set3),
             labels={
@@ -824,7 +826,7 @@ def update_life_health_fig(df, selected_year, lifestyle, health_var):
         font=dict(color='white'),  # Ensure text is visible on the white background
         xaxis=dict(showgrid=False),  # Optional: light gridlines
         yaxis=dict(showgrid=True, gridcolor='LightGray'),
-        yaxis_title='Percentage of Lifestyle Group',
+        yaxis_title='Total Count',
         xaxis_title=title_dictionary[lifestyle],
         uniformtext_minsize=8, uniformtext_mode='hide'
     )
@@ -850,7 +852,7 @@ def update_life_anthro_fig(df, selected_year, lifestyle, anthro_var):
         y='percentage',
         color=anthro_var,
         text='formatted_frequency',
-        barmode='group',
+        barmode='stack',
         title=f'{title_dictionary[anthro_var]} by {title_dictionary[lifestyle]} ({selected_year})',
         color_discrete_sequence=randomize_colors(px.colors.qualitative.Set3),
             labels={
@@ -875,34 +877,47 @@ def update_life_anthro_fig(df, selected_year, lifestyle, anthro_var):
     
     return fig
 
-def update_life_chronic_fig(df, selected_year, lifestyle, chronic_var):
-        # Prepare data
-    plot_df = filter_and_prepare_data(df, selected_year, lifestyle, chronic_var)
+def update_life_chronic_fig(df, selected_year, lifestyle, chronic_var, weight_col='wt'):
+    """
+    Create a heatmap showing the proportional density of each pairing of lifestyle and chronic variable.
+    
+    Parameters:
+    df (pd.DataFrame): The original DataFrame with sample data.
+    selected_year (int): The year to filter the data by.
+    lifestyle (str): The column name for the lifestyle variable.
+    chronic_var (str): The column name for the chronic variable.
+    weight_col (str): The column name for the sampling weight (default is 'wt').
+    
+    Returns:
+    fig: Plotly figure object (proportional heatmap).
+    """
+    
+    # Filter the original DataFrame by the selected year
+    filtered_df = df[df['year'] == selected_year]
     
     # Get the mapping dictionaries for lifestyle and chronic_var
     lifestyle_mapping = get_mapping_dict(lifestyle)
     chronic_mapping = get_mapping_dict(chronic_var)
     
     # Apply the mappings
-    plot_df[lifestyle] = plot_df[lifestyle].map(lifestyle_mapping)
-    plot_df[chronic_var] = plot_df[chronic_var].map(chronic_mapping)
+    filtered_df[lifestyle] = filtered_df[lifestyle].map(lifestyle_mapping)
+    filtered_df[chronic_var] = filtered_df[chronic_var].map(chronic_mapping)
     
-    # Generate Plotly bar chart
-    fig = px.bar(
-        plot_df,
-        x=lifestyle,
-        y='percentage',
-        color=chronic_var,
-        text='formatted_frequency',
-        barmode='group',
-        title=f'{title_dictionary[chronic_var]} by {title_dictionary[lifestyle]} ({selected_year})',
-        color_discrete_sequence=randomize_colors(px.colors.qualitative.Set3),
-            labels={
-            "formatted_frequency": "Frequency",
-            "percentage": "Percentage",
-            lifestyle: title_dictionary[lifestyle],
-            chronic_var: title_dictionary[chronic_var]
-        },
+    # Calculate weighted frequencies using the provided function
+    weighted_df = weighted_frequency(filtered_df, [lifestyle, chronic_var], weight_col=weight_col)
+    
+    # Normalize the frequencies within each lifestyle group
+    weighted_df['normalized_wt'] = weighted_df.groupby(lifestyle)[weight_col].apply(lambda x: x / x.sum())
+    
+    # Pivot the DataFrame to create a matrix suitable for a heatmap
+    heatmap_data = weighted_df.pivot(index=chronic_var, columns=lifestyle, values='normalized_wt').fillna(0)
+    
+    # Generate a heatmap showing proportions within each lifestyle group
+    fig = px.imshow(
+        heatmap_data,
+        labels=dict(x=title_dictionary[lifestyle], y=title_dictionary[chronic_var], color="Proportion"),
+        title=f'Proportional Density of {title_dictionary[chronic_var]} by {title_dictionary[lifestyle]} ({selected_year})',
+        color_continuous_scale='Turbo'
     )
     
     fig.update_layout(
@@ -911,54 +926,68 @@ def update_life_chronic_fig(df, selected_year, lifestyle, chronic_var):
         paper_bgcolor='rgba(0,0,0,0)',  # Keep the outer background transparent (or dark)
         font=dict(color='white'),  # Ensure text is visible on the white background
         xaxis=dict(showgrid=False),  # Optional: light gridlines
-        yaxis=dict(showgrid=True, gridcolor='LightGray'),
-        yaxis_title='Percentage of Lifestyle Group',
+        yaxis=dict(showgrid=False),  # Optional: light gridlines
         xaxis_title=title_dictionary[lifestyle],
-        uniformtext_minsize=8, uniformtext_mode='hide'
+        yaxis_title=title_dictionary[chronic_var]
     )
     
     return fig
 
-def update_life_access_fig(df, selected_year, lifestyle, access_var):
-        # Prepare data
-    plot_df = filter_and_prepare_data(df, selected_year, lifestyle, access_var)
+
+def update_life_access_fig(df, selected_year, lifestyle, access_var, weight_col='wt'):
+    """
+    Create a violin plot showing the distribution of access variables within lifestyle groups using weighted frequencies.
     
-    # Get the mapping dictionaries for lifestyle and access_var
+    Parameters:
+    df (pd.DataFrame): The original DataFrame with sample data.
+    selected_year (int): The year to filter the data by.
+    lifestyle (str): The column name for the lifestyle variable.
+    access_var (str): The column name for the access variable.
+    weight_col (str): The column name for the sampling weight (default is 'wt').
+    
+    Returns:
+    fig: Plotly figure object (violin plot).
+    """
+    
+    # Filter the DataFrame by the selected year
+    filtered_df = df[df['year'] == selected_year]
+    
+    # Aggregate the data by lifestyle and access variable, weighted by the sampling weight
+    weighted_df = filtered_df.groupby([lifestyle, access_var])[weight_col].sum().reset_index()
+    
+    # Normalize weights within each lifestyle group to get proportions
+    weighted_df['proportion'] = weighted_df.groupby(lifestyle)[weight_col].apply(lambda x: x / x.sum())
+
     lifestyle_mapping = get_mapping_dict(lifestyle)
     access_mapping = get_mapping_dict(access_var)
-    
-    # Apply the mappings
-    plot_df[lifestyle] = plot_df[lifestyle].map(lifestyle_mapping)
-    plot_df[access_var] = plot_df[access_var].map(access_mapping)
-    
-    # Generate Plotly bar chart
-    fig = px.bar(
-        plot_df,
+    weighted_df[lifestyle] = weighted_df[lifestyle].map(lifestyle_mapping)
+    weighted_df[access_var] = weighted_df[access_var].map(access_mapping)
+
+    # Generate a violin plot
+    fig = px.violin(
+        weighted_df,
         x=lifestyle,
-        y='percentage',
-        color=access_var,
-        text='formatted_frequency',
-        barmode='group',
-        title=f'{title_dictionary[access_var]} by {title_dictionary[lifestyle]} ({selected_year})',
-        color_discrete_sequence=randomize_colors(px.colors.qualitative.Set3),
-            labels={
-            "formatted_frequency": "Frequency",
-            "percentage": "Percentage",
+        y='proportion',
+        color=lifestyle,
+        box=True,  # Draw a box plot inside the violin
+        points='all',  # Show all points
+        title=f'Distribution of {title_dictionary[access_var]} by {title_dictionary[lifestyle]} ({selected_year})',
+        labels={
             lifestyle: title_dictionary[lifestyle],
-            access_var: title_dictionary[access_var]
+            'proportion': f'Proportion of {title_dictionary[access_var]}',
         },
+        color_discrete_sequence=px.colors.qualitative.Set3
     )
     
     fig.update_layout(
         template='plotly_dark',
-        plot_bgcolor='white',  # Set plot area background to white
-        paper_bgcolor='rgba(0,0,0,0)',  # Keep the outer background transparent (or dark)
-        font=dict(color='white'),  # Ensure text is visible on the white background
-        xaxis=dict(showgrid=False),  # Optional: light gridlines
+        plot_bgcolor='white',
+        paper_bgcolor='rgba(0,0,0,0)',
+        font=dict(color='white'),
+        xaxis=dict(showgrid=False),
         yaxis=dict(showgrid=True, gridcolor='LightGray'),
-        yaxis_title='Percentage of Lifestyle Group',
         xaxis_title=title_dictionary[lifestyle],
-        uniformtext_minsize=8, uniformtext_mode='hide'
+        yaxis_title=f'Proportion of {title_dictionary[access_var]}'
     )
     
     return fig
