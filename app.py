@@ -31,6 +31,7 @@ navbar = dbc.Navbar(
                     dbc.NavItem(dbc.NavLink("Summary", href="/summary")),
                     dbc.NavItem(dbc.NavLink("Demographics", href="/demographics")),
                     dbc.NavItem(dbc.NavLink("Lifestyle", href="/lifestyle")),
+                    dbc.NavItem(dbc.NavLink("Chronic Conditions", href="/chronic_conditions")),
                     dbc.DropdownMenu(
                         children=[
                             dbc.DropdownMenuItem("More", header=True),

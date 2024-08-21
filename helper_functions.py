@@ -962,3 +962,179 @@ def update_life_access_fig(df, selected_year, lifestyle, access_var):
     )
     
     return fig
+
+def update_chronic_anthro_fig(df, selected_year, chronic_condition, anthro_var):
+    # Prepare data
+    plot_df = filter_and_prepare_data(df, selected_year, chronic_condition, anthro_var)
+    
+    # Get the mapping dictionaries for chronic_condition and anthro_var
+    chronic_mapping = get_mapping_dict(chronic_condition)
+    anthro_mapping = get_mapping_dict(anthro_var)
+
+    # Apply the mappings
+    plot_df[chronic_condition] = plot_df[chronic_condition].map(chronic_mapping)
+    plot_df[anthro_var] = plot_df[anthro_var].map(anthro_mapping)
+
+    #generate Plotly bar chart
+    fig = px.bar(
+        plot_df,
+        x=chronic_condition,
+        y='percentage',
+        color=anthro_var,
+        text='formatted_frequency',
+        barmode='group',
+        title=f'{title_dictionary[anthro_var]} by {title_dictionary[chronic_condition]} ({selected_year})',
+        color_discrete_sequence=randomize_colors(px.colors.qualitative.Set3),
+            labels={
+            "formatted_frequency": "Frequency",
+            "percentage": "Percentage",
+            chronic_condition: title_dictionary[chronic_condition],
+            anthro_var: title_dictionary[anthro_var]
+        },
+    )
+
+    fig.update_layout(
+        template='plotly_dark',
+        plot_bgcolor='white',  # Set plot area background to white
+        paper_bgcolor='rgba(0,0,0,0)',  # Keep the outer background transparent (or dark)
+        font=dict(color='white'),  # Ensure text is visible on the white background
+        xaxis=dict(showgrid=False),  # Optional: light gridlines
+        yaxis=dict(showgrid=True, gridcolor='LightGray'),
+        yaxis_title='Percentage of Chronic Condition',
+        xaxis_title=title_dictionary[chronic_condition],
+        uniformtext_minsize=8, uniformtext_mode='hide'
+    )
+
+    return fig
+
+def update_chronic_health_fig(df, selected_year, chronic_condition, health_var):
+    # Prepare data
+    plot_df = filter_and_prepare_data(df, selected_year, chronic_condition, health_var)
+    
+    # Get the mapping dictionaries for chronic_condition and health_var
+    chronic_mapping = get_mapping_dict(chronic_condition)
+    health_mapping = get_mapping_dict(health_var)
+
+    # Apply the mappings
+    plot_df[chronic_condition] = plot_df[chronic_condition].map(chronic_mapping)
+    plot_df[health_var] = plot_df[health_var].map(health_mapping)
+
+    #generate Plotly bar chart
+    fig = px.bar(
+        plot_df,
+        x=chronic_condition,
+        y='percentage',
+        color=health_var,
+        text='formatted_frequency',
+        barmode='group',
+        title=f'{title_dictionary[health_var]} by {title_dictionary[chronic_condition]} ({selected_year})',
+        color_discrete_sequence=randomize_colors(px.colors.qualitative.Set3),
+            labels={
+            "formatted_frequency": "Frequency",
+            "percentage": "Percentage",
+            chronic_condition: title_dictionary[chronic_condition],
+            health_var: title_dictionary[health_var]
+        },
+    )
+
+    fig.update_layout(
+        template='plotly_dark',
+        plot_bgcolor='white',  # Set plot area background to white
+        paper_bgcolor='rgba(0,0,0,0)',  # Keep the outer background transparent (or dark)
+        font=dict(color='white'),  # Ensure text is visible on the white background
+        xaxis=dict(showgrid=False),  # Optional: light gridlines
+        yaxis=dict(showgrid=True, gridcolor='LightGray'),
+        yaxis_title='Percentage of Chronic Condition',
+        xaxis_title=title_dictionary[chronic_condition],
+        uniformtext_minsize=8, uniformtext_mode='hide'
+    )
+
+    return fig
+
+def update_chronic_lifestyle_fig(df, selected_year, chronic_condition, lifestyle_var):
+    # Prepare data
+    plot_df = filter_and_prepare_data(df, selected_year, chronic_condition, lifestyle_var)
+    
+    # Get the mapping dictionaries for chronic_condition and lifestyle_var
+    chronic_mapping = get_mapping_dict(chronic_condition)
+    lifestyle_mapping = get_mapping_dict(lifestyle_var)
+
+    # Apply the mappings
+    plot_df[chronic_condition] = plot_df[chronic_condition].map(chronic_mapping)
+    plot_df[lifestyle_var] = plot_df[lifestyle_var].map(lifestyle_mapping)
+
+    #generate Plotly bar chart
+    fig = px.bar(
+        plot_df,
+        x=chronic_condition,
+        y='percentage',
+        color=lifestyle_var,
+        text='formatted_frequency',
+        barmode='group',
+        title=f'{title_dictionary[lifestyle_var]} by {title_dictionary[chronic_condition]} ({selected_year})',
+        color_discrete_sequence=randomize_colors(px.colors.qualitative.Set3),
+            labels={
+            "formatted_frequency": "Frequency",
+            "percentage": "Percentage",
+            chronic_condition: title_dictionary[chronic_condition],
+            lifestyle_var: title_dictionary[lifestyle_var]
+        },
+    )
+
+    fig.update_layout(
+        template='plotly_dark',
+        plot_bgcolor='white',  # Set plot area background to white
+        paper_bgcolor='rgba(0,0,0,0)',  # Keep the outer background transparent (or dark)
+        font=dict(color='white'),  # Ensure text is visible on the white background
+        xaxis=dict(showgrid=False),  # Optional: light gridlines
+        yaxis=dict(showgrid=True, gridcolor='LightGray'),
+        yaxis_title='Percentage of Chronic Condition',
+        xaxis_title=title_dictionary[chronic_condition],
+        uniformtext_minsize=8, uniformtext_mode='hide'
+    )
+
+    return fig
+
+def update_chronic_access_fig(df, selected_year, chronic_condition, access_var):
+    # Prepare data
+    plot_df = filter_and_prepare_data(df, selected_year, chronic_condition, access_var)
+    
+    # Get the mapping dictionaries for chronic_condition and access_var
+    chronic_mapping = get_mapping_dict(chronic_condition)
+    access_mapping = get_mapping_dict(access_var)
+
+    # Apply the mappings
+    plot_df[chronic_condition] = plot_df[chronic_condition].map(chronic_mapping)
+    plot_df[access_var] = plot_df[access_var].map(access_mapping)
+
+    #generate Plotly bar chart
+    fig = px.bar(
+        plot_df,
+        x=chronic_condition,
+        y='percentage',
+        color=access_var,
+        text='formatted_frequency',
+        barmode='group',
+        title=f'{title_dictionary[access_var]} by {title_dictionary[chronic_condition]} ({selected_year})',
+        color_discrete_sequence=randomize_colors(px.colors.qualitative.Set3),
+            labels={
+            "formatted_frequency": "Frequency",
+            "percentage": "Percentage",
+            chronic_condition: title_dictionary[chronic_condition],
+            access_var: title_dictionary[access_var]
+        },
+    )
+
+    fig.update_layout(
+        template='plotly_dark',
+        plot_bgcolor='white',  # Set plot area background to white
+        paper_bgcolor='rgba(0,0,0,0)',  # Keep the outer background transparent (or dark)
+        font=dict(color='white'),  # Ensure text is visible on the white background
+        xaxis=dict(showgrid=False),  # Optional: light gridlines
+        yaxis=dict(showgrid=True, gridcolor='LightGray'),
+        yaxis_title='Percentage of Chronic Condition',
+        xaxis_title=title_dictionary[chronic_condition],
+        uniformtext_minsize=8, uniformtext_mode='hide'
+    )
+
+    return fig
