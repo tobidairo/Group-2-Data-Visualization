@@ -23,9 +23,9 @@ layout = dbc.Container(
                         ),
                         html.Hr(className="my-2"),
                         html.P(
-                            "Use the navigation bar to explore detailed maps, summaries, and insights."
+                            "Use the navigation bar to explore detailed summaries and insights."
                         ),
-                        dbc.Button("Get Started", color="primary", href="/summary"),
+                        dbc.Button("Get Started", color="primary", href="/overview"),
                     ],
                     className="p-5 bg-light rounded-3"
                 ),
@@ -53,12 +53,12 @@ layout = dbc.Container(
                     dbc.Card(
                         dbc.CardBody(
                             [
-                                html.H4("Detailed Summaries", className="card-title"),
+                                html.H4("Demographics", className="card-title"),
                                 html.P(
-                                    "Explore detailed summaries of the survey data.",
+                                    "Analyse data by various demographic factors.",
                                     className="card-text",
                                 ),
-                                dbc.Button("View Summary", color="primary", href="/summary"),
+                                dbc.Button("View Demographics", color="primary", href="/demographics"),
                             ]
                         )
                     ),
@@ -68,12 +68,12 @@ layout = dbc.Container(
                     dbc.Card(
                         dbc.CardBody(
                             [
-                                html.H4("Demographics", className="card-title"),
+                                html.H4("Lifestyle", className="card-title"),
                                 html.P(
-                                    "Analyze data by various demographic factors.",
+                                    "Analyze data by various lifestyle factors.",
                                     className="card-text",
                                 ),
-                                dbc.Button("View Demographics", color="primary", href="/demographics"),
+                                dbc.Button("View Lifestyle", color="primary", href="/lifestyle"),
                             ]
                         )
                     ),

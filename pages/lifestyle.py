@@ -30,10 +30,9 @@ layout = dbc.Container(
                                 [
                                     html.H5("How to Use the Graphs", className="alert-heading"),
                                     html.P(
-                                        "At the top of the page, you can select a demographic variable and a year. "
+                                        "At the top of the page, you can select a lifestyle variable and a year. "
                                         "These selections will apply to all graphs below. "
-                                        "Each graph represents a different category: Anthropometric and Clinical Measures, "
-                                        "Chronic Conditions, Health Measures, Lifestyle, and Healthcare Access. "
+                                        "Each graph represents a different category. "
                                         "You can further refine each graph by selecting additional variables specific to that category."
                                     ),
                                     html.P(
