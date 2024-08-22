@@ -2,7 +2,9 @@ import dash
 from dash import dcc, html, callback, Input, Output, register_page
 import dash_bootstrap_components as dbc
 from app import df  # Assuming df is imported from a central app file
-from helper_functions import update_time_series  # Import your time series function
+from helper_functions import update_time_series, get_mapping_dict
+from mappings import state_fullname_mappings
+import plotly.express as px
 
 
 register_page(__name__, name='Overview', path='/overview')
@@ -32,19 +34,9 @@ layout = dbc.Container(
         dbc.Row(
             dbc.Col(
                 dcc.Dropdown(
-                    id='variable-selector-overview',
-                    options=[
-                        {'label': 'Gender', 'value': 'sex'},
-                        {'label': 'Age', 'value': 'age'},
-                        {'label': 'Race', 'value': 'race'},
-                        {'label': 'Exercise', 'value': 'exercise'},
-                        {'label': 'Smoking', 'value': 'smoking'},
-                        {'label': 'BMI Category', 'value': 'bmi_category'},
-                        {'label': 'Asthma', 'value': 'asthma'},
-                        {'label': 'Arthritis', 'value': 'arthritis'},
-                        {'label': 'Cardiac Event', 'value': 'cardiac_event'},
-                    ],
-                    value='sex',
+                    id='state-selector-overview',
+                    options=state_fullname_mappings,
+                    value=1,
                     clearable=False,
                     className="mb-4"
                 ),
@@ -53,7 +45,17 @@ layout = dbc.Container(
         ),
         dbc.Row(
             dbc.Col(
-                dcc.Graph(id='time-series-graph'),
+                dcc.Graph(id='time-series-graph-overview'),
+                width=12
+            ),
+            className="mt-4"
+        ),
+        dbc.Row(
+            dbc.Col(
+                dcc.Graph(
+                    id='homepage-graph',
+                    figure=px.histogram(df, x='state_code', title='Number of Respondents by State')
+                ),
                 width=12
             ),
             className="mt-4"
@@ -66,9 +68,9 @@ layout = dbc.Container(
 # Callback for the time series graph
 
 @callback(
-    Output('time-series-graph', 'figure'),
-    Input('variable-selector-overview', 'value')
+    Output('time-series-graph-overview', 'figure'),
+    Input('state-selector-overview', 'value')
 )
-def update_time_series_graph(selected_variable):
-    figure = update_time_series(df, selected_variable)
+def update_time_series_graph(selected_state):
+    figure = update_time_series(df, selected_state)
     return figure

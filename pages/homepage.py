@@ -82,16 +82,6 @@ layout = dbc.Container(
             ],
             className="mt-4"
         ),
-        dbc.Row(
-            dbc.Col(
-                dcc.Graph(
-                    id='homepage-graph',
-                    figure=px.histogram(df, x='state_code', title='Number of Respondents by State')
-                ),
-                width=12
-            ),
-            className="mt-4"
-        ),
     ],
     fluid=True,
     className="mt-5"

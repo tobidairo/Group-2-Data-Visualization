@@ -81,4 +81,5 @@ app.layout = html.Div([
 def run_dash_app():
     app.run_server(port=8050, debug=True)
 
+# if __name__ == '__main__':
 run_dash_app()

@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 import plotly.express as px
-from mappings import title_dictionary
+from mappings import title_dictionary, state_mapping
 import random
 
 
@@ -450,41 +450,57 @@ def update_frequency_chart(selected_year, selected_variable, df):
 
     return f"Selected variable: {selected_variable}", frequency_chart
 
-def filter_and_prepare_data(df, year=None, demographic=None, y_variable=None):
+def filter_and_prepare_data(df, year=None, x_variable=None, y_variable=None):
     """
-    Filters the DataFrame by the selected demographic variable, then calculates
+    Filters the DataFrame by the selected x_variable variable, then calculates
     the weighted frequency for the y_variable, preparing the data for plotting a time series.
 
     Parameters:
     df (pd.DataFrame): The input DataFrame containing survey data.
     year (int or None): The selected year to filter the data. If None, data from all years will be used.
-    demographic (str): The demographic column to group by (e.g., 'age', 'sex', 'race').
-    y_variable (str): The y-axis variable to calculate the weighted frequency for (e.g., 'smoking', 'exercise').
+    x_variable (str or None): The x_variable column to group by (e.g., 'age', 'sex', 'race').
+    y_variable (str or None): The y-axis variable to calculate the weighted frequency for (e.g., 'smoking', 'exercise').
 
     Returns:
-    pd.DataFrame: A DataFrame ready for plotting, with columns for the demographic, y_variable,
+    pd.DataFrame: A DataFrame ready for plotting, with columns for the x_variable, y_variable,
                   the weighted frequency, and the percentage of total responses across years.
     """
 
     # Filter the DataFrame by the selected year if specified, otherwise include all years
-    if year:
+    if year is not None:
         df_filtered = df[df['year'] == year]
     else:
         df_filtered = df.copy()
 
-    # Calculate weighted frequency for the y_variable grouped by the demographic and year
-    freq_df = df_filtered.groupby(['year', demographic, y_variable])['wt'].sum().reset_index()
+    # Build the groupby list dynamically based on the presence of x_variable and y_variable
+    group_by_cols = ['year']
+    if x_variable is not None:
+        group_by_cols.append(x_variable)
+    if y_variable is not None:
+        group_by_cols.append(y_variable)
 
-    # Calculate total weighted frequency for each demographic category within each year
-    total_freq = freq_df.groupby(['year', demographic])['wt'].sum().reset_index()
+    # Calculate weighted frequency for the y_variable grouped by the x_variable and year
+    freq_df = df_filtered.groupby(group_by_cols)['wt'].sum().reset_index()
+
+    # Calculate total weighted frequency for each x_variable category within each year
+    total_group_by = ['year']
+    if x_variable is not None:
+        total_group_by.append(x_variable)
+    total_freq = freq_df.groupby(total_group_by)['wt'].sum().reset_index()
     total_freq.rename(columns={'wt': 'total_wt'}, inplace=True)
 
-    # Merge to calculate percentage of total for each y_variable category within each demographic group
-    merged_df = pd.merge(freq_df, total_freq, on=['year', demographic])
+    # Merge to calculate percentage of total for each y_variable category within each x_variable group
+    merged_df = pd.merge(freq_df, total_freq, on=total_group_by, how='left')
     merged_df['percentage'] = (merged_df['wt'] / merged_df['total_wt']) * 100
 
     # Prepare the DataFrame for plotting
-    plot_df = merged_df[[demographic, y_variable, 'year', 'wt', 'percentage']].copy()
+    plot_cols = ['year', 'wt', 'percentage']
+    if x_variable is not None:
+        plot_cols.insert(0, x_variable)
+    if y_variable is not None:
+        plot_cols.insert(1 if x_variable is not None else 0, y_variable)
+
+    plot_df = merged_df[plot_cols].copy()
     plot_df.rename(columns={'wt': 'frequency'}, inplace=True)
 
     plot_df['percentage'] = plot_df['percentage'].round(1)  # Round percentage to 1 decimal place
@@ -492,7 +508,6 @@ def filter_and_prepare_data(df, year=None, demographic=None, y_variable=None):
     plot_df['formatted_frequency'] = (plot_df['frequency'] / 1e6).round(2).astype(str) + 'M'  # Convert to millions and format to 2 decimals
 
     return plot_df
-
 
 def update_dem_anthro_fig(df, selected_year, demographic, anthro_var):
     """
@@ -802,8 +817,8 @@ def update_life_health_fig(df, selected_year, lifestyle, health_var):
     health_mapping = get_mapping_dict(health_var)
     
     # Apply the mappings
-    plot_df[lifestyle] = plot_df[lifestyle].map(lifestyle_mapping)
-    plot_df[health_var] = plot_df[health_var].map(health_mapping)
+    plot_df.loc[:, lifestyle] = plot_df[lifestyle].map(lifestyle_mapping)
+    plot_df.loc[:, health_var] = plot_df[health_var].map(health_mapping)
     
     # Generate Plotly bar chart
     fig = px.bar(
@@ -846,8 +861,8 @@ def update_life_anthro_fig(df, selected_year, lifestyle, anthro_var):
     anthro_mapping = get_mapping_dict(anthro_var)
     
     # Apply the mappings
-    plot_df[lifestyle] = plot_df[lifestyle].map(lifestyle_mapping)
-    plot_df[anthro_var] = plot_df[anthro_var].map(anthro_mapping)
+    plot_df.loc[:, lifestyle] = plot_df[lifestyle].map(lifestyle_mapping)
+    plot_df.loc[:, anthro_var] = plot_df[anthro_var].map(anthro_mapping)
     
     # Generate Plotly bar chart
     fig = px.bar(
@@ -904,8 +919,8 @@ def update_life_chronic_fig(df, selected_year, lifestyle, chronic_var, weight_co
     chronic_mapping = get_mapping_dict(chronic_var)
     
     # Apply the mappings
-    filtered_df[lifestyle] = filtered_df[lifestyle].map(lifestyle_mapping)
-    filtered_df[chronic_var] = filtered_df[chronic_var].map(chronic_mapping)
+    filtered_df.loc[:, lifestyle] = filtered_df[lifestyle].map(lifestyle_mapping)
+    filtered_df.loc[:, chronic_var] = filtered_df[chronic_var].map(chronic_mapping)
     
     # Calculate weighted frequencies using the provided function
     weighted_df = weighted_frequency(filtered_df, [lifestyle, chronic_var], weight_col=weight_col)
@@ -997,40 +1012,46 @@ def update_life_access_fig(df, selected_year, lifestyle, access_var, weight_col=
     return fig
 
 
-def update_time_series(df, selected_variable):
+def update_time_series(df, selected_state):
     """
     Generates a time series plot based on the selected variable.
 
     Parameters:
     df (pd.DataFrame): The input DataFrame containing the survey data.
-    selected_variable (str): The variable selected by the user (e.g., 'sex', 'age', 'exercise').
+    selected_state (str): The state selected by the user .
 
     Returns:
     plotly.graph_objs._figure.Figure: A Plotly figure representing the time series.
     """
 
     # Correctly pass the selected variable to y_variable
-    time_series_data = filter_and_prepare_data(df, year=None, demographic='age', y_variable=selected_variable)
+    time_series_data = filter_and_prepare_data(df, year=None, x_variable='state', y_variable=None)
 
     # Ensure there is data to plot
     if time_series_data.empty:
         return {}
+
+    time_series_data = time_series_data.loc[time_series_data['state'] == selected_state]
 
     # Generate the time series plot
     fig = px.line(
         time_series_data,
         x='year',
         y='frequency',
-        color=selected_variable,  # Color by the selected variable
-        markers=True,
-        title=f'Time Series of {selected_variable.title()} by Age Group (2012-2022)',
+        # color=selected_state,  # Uncomment this if you want to color by the selected variable
+        title=f'Time Series of {state_mapping[selected_state]} Population (2012-2022)',
         labels={
-            selected_variable: selected_variable.title(),
+            selected_state: state_mapping[selected_state],
             'percentage': 'Percentage',
             'year': 'Year'
         },
     )
-    fig.update_layout(hovermode='x unified')
+
+    # Update layout to adjust the y-axis range and hover mode
+    fig.update_layout(
+        hovermode='x unified',
+        yaxis=dict(range=[time_series_data['frequency'].min() * 0.95, time_series_data['frequency'].max() * 1.05])
+    )
 
     return fig
 
