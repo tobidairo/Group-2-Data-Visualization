@@ -70,7 +70,7 @@ layout = dbc.Container(
                             [
                                 html.H4("Lifestyle", className="card-title"),
                                 html.P(
-                                    "Analyze data by various lifestyle factors.",
+                                    "Analyse data by various lifestyle factors.",
                                     className="card-text",
                                 ),
                                 dbc.Button("View Lifestyle", color="primary", href="/lifestyle"),
