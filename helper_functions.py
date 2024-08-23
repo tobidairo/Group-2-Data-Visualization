@@ -552,7 +552,9 @@ def update_dem_anthro_fig(df, selected_year, demographic, anthro_var):
         yaxis=dict(showgrid=True, gridcolor='LightGray'),
         yaxis_title='Percentage of Demographic Group',
         xaxis_title=title_dictionary[demographic],
-        uniformtext_minsize=8, uniformtext_mode='hide'
+        uniformtext_minsize=8, uniformtext_mode='hide',
+        title_x=1,
+        title_xanchor='right',
     )
     
     return fig
@@ -609,7 +611,9 @@ def update_dem_chronic_fig(df, selected_year, demographic, chronic_var):
         yaxis=dict(showgrid=True, gridcolor='LightGray'),
         yaxis_title='Percentage of Demographic Group',
         xaxis_title=title_dictionary[demographic],
-        uniformtext_minsize=8, uniformtext_mode='hide'
+        uniformtext_minsize=8, uniformtext_mode='hide',
+        title_x=1,
+        title_xanchor='right',
     )
     
     return fig
@@ -666,7 +670,9 @@ def update_dem_access_fig(df, selected_year, demographic, access_var):
         yaxis=dict(showgrid=True, gridcolor='LightGray'),
         yaxis_title='Percentage of Demographic Group',
         xaxis_title=title_dictionary[demographic],
-        uniformtext_minsize=8, uniformtext_mode='hide'
+        uniformtext_minsize=8, uniformtext_mode='hide',
+        title_x=1,
+        title_xanchor='right',
     )
     
     return fig
@@ -723,7 +729,9 @@ def update_dem_health_fig(df, selected_year, demographic, health_var):
         yaxis=dict(showgrid=True, gridcolor='LightGray'),
         yaxis_title='Percentage of Demographic Group',
         xaxis_title=title_dictionary[demographic],
-        uniformtext_minsize=8, uniformtext_mode='hide'
+        uniformtext_minsize=8, uniformtext_mode='hide',
+        title_x=1,
+        title_xanchor='right',
     )
     
     return fig
@@ -780,7 +788,9 @@ def update_dem_lifestyle_fig(df, selected_year, demographic, lifestyle_var):
         yaxis=dict(showgrid=True, gridcolor='LightGray'),
         yaxis_title='Percentage of Demographic Group',
         xaxis_title=title_dictionary[demographic],
-        uniformtext_minsize=8, uniformtext_mode='hide'
+        uniformtext_minsize=8, uniformtext_mode='hide',
+        title_x=1,
+        title_xanchor='right',
     )
     
     return fig
@@ -846,7 +856,9 @@ def update_life_health_fig(df, selected_year, lifestyle, health_var):
         yaxis=dict(showgrid=True, gridcolor='LightGray'),
         yaxis_title='Percentage',
         xaxis_title=title_dictionary[lifestyle],
-        uniformtext_minsize=8, uniformtext_mode='hide'
+        uniformtext_minsize=8, uniformtext_mode='hide',
+        title_x=1,
+        title_xanchor='right',
     )
     
     return fig
@@ -894,7 +906,9 @@ def update_life_anthro_fig(df, selected_year, lifestyle, anthro_var):
         yaxis=dict(showgrid=True, gridcolor='LightGray'),
         yaxis_title='Percentage of Lifestyle Group',
         xaxis_title=title_dictionary[lifestyle],
-        uniformtext_minsize=8, uniformtext_mode='hide'
+        uniformtext_minsize=8, uniformtext_mode='hide',
+        title_x=1,
+        title_xanchor='right',
     )
     
     return fig
@@ -942,7 +956,9 @@ def update_life_chronic_fig(df, selected_year, lifestyle, chronic_var, weight_co
         yaxis=dict(showgrid=True, gridcolor='LightGray'),
         yaxis_title='Percentage of Lifestyle Group',
         xaxis_title=title_dictionary[lifestyle],
-        uniformtext_minsize=8, uniformtext_mode='hide'
+        uniformtext_minsize=8, uniformtext_mode='hide',
+        title_x=1,
+        title_xanchor='right',
     )
     
     return fig
@@ -991,7 +1007,9 @@ def update_life_access_fig(df, selected_year, lifestyle, access_var, weight_col=
         yaxis=dict(showgrid=True, gridcolor='LightGray'),
         yaxis_title='Percentage of Lifestyle Group',
         xaxis_title=title_dictionary[lifestyle],
-        uniformtext_minsize=8, uniformtext_mode='hide'
+        uniformtext_minsize=8, uniformtext_mode='hide',
+        title_x=1,
+        title_xanchor='right',
     )
     
     return fig
