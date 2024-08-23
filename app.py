@@ -17,7 +17,7 @@ app = Dash(__name__, use_pages=True, external_stylesheets=[dbc.themes.SLATE])
 navbar = dbc.Navbar(
     dbc.Container(
         [
-            dbc.NavbarBrand("CDC Survey Dashboard", href="/"),
+            dbc.NavbarBrand("CDC BRFSS Survey Dashboard", href="/"),
             dbc.Nav(
                 [
                     dbc.NavItem(dbc.NavLink("Homepage", href="/")),
