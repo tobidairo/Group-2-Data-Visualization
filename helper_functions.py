@@ -245,8 +245,9 @@ def get_mapping_dict(selected_variable):
         return {
             1: 'Age 18-24',
             2: 'Age 25-34',
-            3: 'Age 45-54',
-            4: 'Age 55-64',
+            3: 'Age 35-44',
+            4: 'Age 45-54',
+            5: 'Age 55-64',
             6: 'Age 65 or older',
             -1: 'Other'
         }
@@ -405,8 +406,8 @@ def update_frequency_chart(selected_year, selected_variable, df):
         x='mapped_labels',
         y='weighted_frequency',
         color='weighted_frequency',
-        color_continuous_scale=px.colors.sequential.PuBuGn,
-        title=f'<b>Adult population count by {selected_variable} in {selected_year}</b>',
+        color_continuous_scale=px.colors.sequential.Blues,
+        title=f'<b>Adult population count by {title_dictionary[selected_variable]} ({selected_year})</b>',
         labels={
             'mapped_labels': selected_variable,
             'weighted_frequency': 'Count'
@@ -418,8 +419,8 @@ def update_frequency_chart(selected_year, selected_variable, df):
 
     # Code to enhance chart layout
     frequency_chart.update_layout(
-        title_font_size=24,  # Increase title font size
-        xaxis_title=f'<b>{selected_variable}</b>',  # Bold x-axis label
+        title_font_size=18,  # Increase title font size
+        xaxis_title=f'<b>{title_dictionary[selected_variable]}</b>',  # Bold x-axis label
         yaxis_title='<b>Count</b>',  # Bold y-axis label
         margin=dict(t=50, b=50, l=50, r=50),  # Adjust margins
         coloraxis_colorbar=dict(
@@ -428,17 +429,6 @@ def update_frequency_chart(selected_year, selected_variable, df):
             tickvals=[0, max(weighted_frequency['weighted_frequency'])//2, max(weighted_frequency['weighted_frequency'])],
             ticktext=['Low', 'Medium', 'High']  # Add colorbar tick text
         )
-    )
-
-    # Add annotations for key points
-    frequency_chart.add_annotation(
-        x=max_label,  # x value of max
-        y=max_value,  # y value of max
-        text="Highest Count",  # Annotation text
-        showarrow=True,
-        arrowhead=2,
-        ax=-50,
-        ay=-50
     )
 
     # Update hover mode
@@ -809,7 +799,7 @@ def randomize_colors(color_sequence):
     return randomized_sequence
 
 def update_life_health_fig(df, selected_year, lifestyle, health_var):
-        # Prepare data
+    # Prepare data
     plot_df = filter_and_prepare_data(df, selected_year, lifestyle, health_var)
     
     # Get the mapping dictionaries for lifestyle and health_var
@@ -820,17 +810,21 @@ def update_life_health_fig(df, selected_year, lifestyle, health_var):
     plot_df.loc[:, lifestyle] = plot_df[lifestyle].map(lifestyle_mapping)
     plot_df.loc[:, health_var] = plot_df[health_var].map(health_mapping)
     
+    # Normalize frequencies to percentages
+    plot_df['percentage'] = plot_df.groupby(lifestyle)['frequency'].apply(lambda x: x / x.sum() * 100)
+    plot_df['percentage_text'] = plot_df['percentage'].apply(lambda x: f'{x:.1f}%')
+    
     # Generate Plotly bar chart
     fig = px.bar(
         plot_df,
         x=lifestyle,
-        y='frequency',
+        y='percentage',
         color=health_var,
-        text='percentage_text',
+        text='formatted_frequency',
         barmode='stack',
         title=f'{title_dictionary[health_var]} by {title_dictionary[lifestyle]} ({selected_year})',
         color_discrete_sequence=randomize_colors(px.colors.qualitative.Set3),
-            labels={
+        labels={
             "formatted_frequency": "Frequency",
             "percentage": "Percentage",
             lifestyle: title_dictionary[lifestyle],
@@ -840,12 +834,12 @@ def update_life_health_fig(df, selected_year, lifestyle, health_var):
     
     fig.update_layout(
         template='plotly_dark',
-        plot_bgcolor='white',  # Set plot area background to white
-        paper_bgcolor='rgba(0,0,0,0)',  # Keep the outer background transparent (or dark)
-        font=dict(color='white'),  # Ensure text is visible on the white background
-        xaxis=dict(showgrid=False),  # Optional: light gridlines
+        plot_bgcolor='white',
+        paper_bgcolor='rgba(0,0,0,0)',
+        font=dict(color='white'),
+        xaxis=dict(showgrid=False),
         yaxis=dict(showgrid=True, gridcolor='LightGray'),
-        yaxis_title='Total Count',
+        yaxis_title='Percentage',
         xaxis_title=title_dictionary[lifestyle],
         uniformtext_minsize=8, uniformtext_mode='hide'
     )
@@ -897,105 +891,33 @@ def update_life_anthro_fig(df, selected_year, lifestyle, anthro_var):
     return fig
 
 def update_life_chronic_fig(df, selected_year, lifestyle, chronic_var, weight_col='wt'):
-    """
-    Create a heatmap showing the proportional density of each pairing of lifestyle and chronic variable.
-    
-    Parameters:
-    df (pd.DataFrame): The original DataFrame with sample data.
-    selected_year (int): The year to filter the data by.
-    lifestyle (str): The column name for the lifestyle variable.
-    chronic_var (str): The column name for the chronic variable.
-    weight_col (str): The column name for the sampling weight (default is 'wt').
-    
-    Returns:
-    fig: Plotly figure object (proportional heatmap).
-    """
-    
-    # Filter the original DataFrame by the selected year
-    filtered_df = df[df['year'] == selected_year]
+    # Prepare data
+    plot_df = filter_and_prepare_data(df, selected_year, lifestyle, chronic_var)
     
     # Get the mapping dictionaries for lifestyle and chronic_var
     lifestyle_mapping = get_mapping_dict(lifestyle)
     chronic_mapping = get_mapping_dict(chronic_var)
     
     # Apply the mappings
-    filtered_df.loc[:, lifestyle] = filtered_df[lifestyle].map(lifestyle_mapping)
-    filtered_df.loc[:, chronic_var] = filtered_df[chronic_var].map(chronic_mapping)
+    plot_df.loc[:, lifestyle] = plot_df[lifestyle].map(lifestyle_mapping)
+    plot_df.loc[:, chronic_var] = plot_df[chronic_var].map(chronic_mapping)
     
-    # Calculate weighted frequencies using the provided function
-    weighted_df = weighted_frequency(filtered_df, [lifestyle, chronic_var], weight_col=weight_col)
-    
-    # Normalize the frequencies within each lifestyle group
-    weighted_df['normalized_wt'] = weighted_df.groupby(lifestyle)[weight_col].apply(lambda x: x / x.sum())
-    
-    # Pivot the DataFrame to create a matrix suitable for a heatmap
-    heatmap_data = weighted_df.pivot(index=chronic_var, columns=lifestyle, values='normalized_wt').fillna(0)
-    
-    # Generate a heatmap showing proportions within each lifestyle group
-    fig = px.imshow(
-        heatmap_data,
-        labels=dict(x=title_dictionary[lifestyle], y=title_dictionary[chronic_var], color="Proportion"),
-        title=f'Proportional Density of {title_dictionary[chronic_var]} by {title_dictionary[lifestyle]} ({selected_year})',
-        color_continuous_scale='Turbo'
-    )
-    
-    fig.update_layout(
-        template='plotly_dark',
-        plot_bgcolor='white',  # Set plot area background to white
-        paper_bgcolor='rgba(0,0,0,0)',  # Keep the outer background transparent (or dark)
-        font=dict(color='white'),  # Ensure text is visible on the white background
-        xaxis=dict(showgrid=False),  # Optional: light gridlines
-        yaxis=dict(showgrid=False),  # Optional: light gridlines
-        xaxis_title=title_dictionary[lifestyle],
-        yaxis_title=title_dictionary[chronic_var]
-    )
-    
-    return fig
-
-
-def update_life_access_fig(df, selected_year, lifestyle, access_var, weight_col='wt'):
-    """
-    Create a violin plot showing the distribution of access variables within lifestyle groups using weighted frequencies.
-    
-    Parameters:
-    df (pd.DataFrame): The original DataFrame with sample data.
-    selected_year (int): The year to filter the data by.
-    lifestyle (str): The column name for the lifestyle variable.
-    access_var (str): The column name for the access variable.
-    weight_col (str): The column name for the sampling weight (default is 'wt').
-    
-    Returns:
-    fig: Plotly figure object (violin plot).
-    """
-    
-    # Filter the DataFrame by the selected year
-    filtered_df = df[df['year'] == selected_year]
-    
-    # Aggregate the data by lifestyle and access variable, weighted by the sampling weight
-    weighted_df = filtered_df.groupby([lifestyle, access_var])[weight_col].sum().reset_index()
-    
-    # Normalize weights within each lifestyle group to get proportions
-    weighted_df['proportion'] = weighted_df.groupby(lifestyle)[weight_col].apply(lambda x: x / x.sum())
-
-    lifestyle_mapping = get_mapping_dict(lifestyle)
-    access_mapping = get_mapping_dict(access_var)
-    weighted_df[lifestyle] = weighted_df[lifestyle].map(lifestyle_mapping)
-    weighted_df[access_var] = weighted_df[access_var].map(access_mapping)
-
-    # Generate a violin plot
-    fig = px.violin(
-        weighted_df,
+    # Generate Plotly bar chart
+    fig = px.bar(
+        plot_df,
         x=lifestyle,
-        y='proportion',
-        color=lifestyle,
-        box=True,  # Draw a box plot inside the violin
-        points='all',  # Show all points
-        title=f'Distribution of {title_dictionary[access_var]} by {title_dictionary[lifestyle]} ({selected_year})',
+        y='percentage',
+        color=chronic_var,
+        text='formatted_frequency',
+        barmode='stack',
+        title=f'{title_dictionary[chronic_var]} by {title_dictionary[lifestyle]} ({selected_year})',
+        color_discrete_sequence=randomize_colors(px.colors.qualitative.Set3),
         labels={
+            "formatted_frequency": "Frequency",
+            "percentage": "Percentage",
             lifestyle: title_dictionary[lifestyle],
-            'proportion': f'Proportion of {title_dictionary[access_var]}',
+            chronic_var: title_dictionary[chronic_var]
         },
-        color_discrete_sequence=px.colors.qualitative.Set3
     )
     
     fig.update_layout(
@@ -1005,53 +927,174 @@ def update_life_access_fig(df, selected_year, lifestyle, access_var, weight_col=
         font=dict(color='white'),
         xaxis=dict(showgrid=False),
         yaxis=dict(showgrid=True, gridcolor='LightGray'),
+        yaxis_title='Percentage of Lifestyle Group',
         xaxis_title=title_dictionary[lifestyle],
-        yaxis_title=f'Proportion of {title_dictionary[access_var]}'
+        uniformtext_minsize=8, uniformtext_mode='hide'
     )
     
     return fig
 
 
-def update_time_series(df, selected_state):
+def update_life_access_fig(df, selected_year, lifestyle, access_var, weight_col='wt'):
+    # Prepare data
+    plot_df = filter_and_prepare_data(df, selected_year, lifestyle, access_var)
+    
+    # Get the mapping dictionaries for lifestyle and access_var
+    lifestyle_mapping = get_mapping_dict(lifestyle)
+    access_mapping = get_mapping_dict(access_var)
+    
+    # Apply the mappings
+    plot_df.loc[:, lifestyle] = plot_df[lifestyle].map(lifestyle_mapping)
+    plot_df.loc[:, access_var] = plot_df[access_var].map(access_mapping)
+    
+    # Generate Plotly bar chart
+    fig = px.bar(
+        plot_df,
+        x=lifestyle,
+        y='percentage',
+        color=access_var,
+        text='formatted_frequency',
+        barmode='stack',
+        title=f'{title_dictionary[access_var]} by {title_dictionary[lifestyle]} ({selected_year})',
+        color_discrete_sequence=randomize_colors(px.colors.qualitative.Set3),
+        labels={
+            "formatted_frequency": "Frequency",
+            "percentage": "Percentage",
+            lifestyle: title_dictionary[lifestyle],
+            access_var: title_dictionary[access_var]
+        },
+    )
+    
+    fig.update_layout(
+        template='plotly_dark',
+        plot_bgcolor='white',
+        paper_bgcolor='rgba(0,0,0,0)',
+        font=dict(color='white'),
+        xaxis=dict(showgrid=False),
+        yaxis=dict(showgrid=True, gridcolor='LightGray'),
+        yaxis_title='Percentage of Lifestyle Group',
+        xaxis_title=title_dictionary[lifestyle],
+        uniformtext_minsize=8, uniformtext_mode='hide'
+    )
+    
+    return fig
+
+
+
+def update_time_series(df, selected_state, variable, all=False):
     """
     Generates a time series plot based on the selected variable.
 
     Parameters:
     df (pd.DataFrame): The input DataFrame containing the survey data.
-    selected_state (str): The state selected by the user .
+    selected_state (str): The state selected by the user.
+    variable (str): The demographic variable to be analyzed.
 
     Returns:
     plotly.graph_objs._figure.Figure: A Plotly figure representing the time series.
     """
 
-    # Correctly pass the selected variable to y_variable
-    time_series_data = filter_and_prepare_data(df, year=None, x_variable='state', y_variable=None)
+    # Filter the data based on the selected state and ensure it excludes the year 2014
+    time_series_data = filter_and_prepare_data(df, year=None, x_variable='state', y_variable=variable)
 
-    # Ensure there is data to plot
     if time_series_data.empty:
         return {}
 
     time_series_data = time_series_data.loc[time_series_data['state'] == selected_state]
+    time_series_data = time_series_data.loc[time_series_data['year'].astype(int) != 2014]
+    time_series_data[variable] = time_series_data[variable].map(get_mapping_dict(variable))
 
-    # Generate the time series plot
-    fig = px.line(
+    # Calculate the total frequency for each year
+    total_per_year = time_series_data.groupby('year')['frequency'].sum().reset_index()
+    total_per_year['formatted_total'] = total_per_year['frequency'].apply(lambda x: f'{x / 1e6:.2f}M')
+
+    # Generate the stacked area plot
+    fig = px.area(
         time_series_data,
         x='year',
         y='frequency',
-        # color=selected_state,  # Uncomment this if you want to color by the selected variable
-        title=f'Time Series of {state_mapping[selected_state]} Population (2012-2022)',
+        color=variable,
+        title=f'Population by {variable.title()} in {state_mapping[selected_state]} (2012-2022)',
         labels={
-            selected_state: state_mapping[selected_state],
-            'percentage': 'Percentage',
-            'year': 'Year'
-        },
+            variable: variable.title(),
+            'frequency': 'Count',
+            'year': 'Year',
+            'formatted_frequency': 'Count (Millions)'
+        }
     )
 
     # Update layout to adjust the y-axis range and hover mode
     fig.update_layout(
         hovermode='x unified',
-        yaxis=dict(range=[time_series_data['frequency'].min() * 0.95, time_series_data['frequency'].max() * 1.05])
+        yaxis=dict(range=[0, total_per_year['frequency'].max() * 1.1]),
+        xaxis=dict(tickmode='linear', tick0=2012, dtick=1)  # Ensure yearly ticks
     )
 
+    # Add the total text to the plot
+    for year, formatted_total in zip(total_per_year['year'], total_per_year['formatted_total']):
+        fig.add_annotation(
+            x=year,
+            y=total_per_year.loc[total_per_year['year'] == year, 'frequency'].values[0],
+            text=formatted_total,
+            showarrow=False,
+            yshift=10
+        )
+
     return fig
+
+def update_overview_bar(df, selected_state, variable, all=False):
+    """
+    Generates a stacked bar chart based on the selected variable.
+
+    Parameters:
+    df (pd.DataFrame): The input DataFrame containing the survey data.
+    selected_state (str): The state selected by the user.
+    variable (str): The variable to group by in the stacked bar chart.
+
+    Returns:
+    plotly.graph_objs._figure.Figure: A Plotly figure representing the stacked bar chart.
+    """
+
+    # Filter the data based on the selected state and ensure it excludes the year 2014
+    filtered_data = filter_and_prepare_data(df, year=None, x_variable='state', y_variable=variable)
+
+    if filtered_data.empty:
+        return {}
+
+    filtered_data = filtered_data.loc[filtered_data['state'] == selected_state]
+    filtered_data = filtered_data.loc[filtered_data['year'].astype(int) != 2014]
+    filtered_data[variable] = filtered_data[variable].map(get_mapping_dict(variable))
+
+    # Generate the stacked bar chart
+    fig = px.bar(
+        filtered_data,
+        x='year',
+        y='percentage',
+        color=variable,
+        text='percentage_text',
+        title=f'{variable.title()} as a Percentage of Population in {state_mapping[selected_state]} (2012-2022)',
+        labels={
+            variable: variable.title(),
+            'percentage': 'Percentage',
+            'year': 'Year',
+            'percentage_text': 'Percentage'
+        }
+    )
+
+    # Update layout to adjust the y-axis range and hover mode
+    fig.update_layout(
+        barmode='stack',
+        hovermode='x unified',
+        yaxis=dict(range=[0, 100]),
+        xaxis=dict(tickmode='linear', tick0=2012, dtick=1)  # Ensure yearly ticks
+    )
+
+    fig.update_traces(textposition='inside')
+
+    return fig
+
+
+
+def percentage_plot(df, variable):
+    pass
 

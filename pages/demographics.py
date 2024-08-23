@@ -33,8 +33,7 @@ layout = dbc.Container(
                                     html.P(
                                         "At the top of the page, you can select a demographic variable and a year. "
                                         "These selections will apply to all graphs below. "
-                                        "Each graph represents a different category: Anthropometric and Clinical Measures, "
-                                        "Chronic Conditions, Health Measures, Lifestyle, and Healthcare Access. "
+                                        "Each graph represents a different category. "
                                         "You can further refine each graph by selecting additional variables specific to that category."
                                     ),
                                     html.P(
@@ -175,7 +174,7 @@ layout = dbc.Container(
         dbc.Row(
             dbc.Col(
                     [
-                        html.Div('Anthropometrics & Clinical Measures', className='form-label'),
+                        html.Div('Clinical Measures', className='form-label'),
                         dcc.Dropdown(
                             id='anthropometrics-selector-demographics',
                             options=anthropometric_variable_mappings,  # Replace with your actual options

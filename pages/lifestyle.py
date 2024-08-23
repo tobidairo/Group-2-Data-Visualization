@@ -114,7 +114,7 @@ layout = dbc.Container(
                 ),
                 dbc.Col(
                     [
-                        html.Div('Anthropometrics & Clinical Measures', className='form-label'),
+                        html.Div('Clinical Measures', className='form-label'),
                         dcc.Dropdown(
                             id='anthropometrics-selector-lifestyle',
                             options=anthropometric_variable_mappings,

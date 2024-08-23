@@ -57,7 +57,6 @@ population_dropdown_mappings = [
                               {'label': 'Mental Health', 'value': 'mental_health'},
                               {'label': 'Medcost', 'value': 'medcost'},
                               {'label': 'Checkup', 'value': 'checkup'},
-                              {'label': 'Eye Exam', 'value': 'eye_exam'},
                               {'label': 'Physical Health', 'value': 'physical_health'},
                               {'label': 'Poor Health', 'value': 'poor_health'},
                               {'label': 'Stop Smoking', 'value': 'stop_smoking'},
@@ -70,10 +69,6 @@ population_dropdown_mappings = [
                               {'label': 'Arthritis', 'value': 'arthritis'},
                               {'label': 'Sex', 'value': 'sex'},
                               {'label': 'Age', 'value': 'age'},
-                              {'label': 'Height', 'value': 'height'},
-                              {'label': 'Weight', 'value': 'weight'},
-                              {'label': 'Overweight', 'value': 'overweight'},
-                              {'label': 'Children', 'value': 'children'},
                               {'label': 'Income', 'value': 'income'},
                               {'label': 'Race', 'value': 'race'},
                               {'label': 'Smoking', 'value': 'smoking'},
@@ -91,15 +86,12 @@ demographic_variable_mappings = [
     {'label': 'Income', 'value': 'income'},
     {'label': 'Race', 'value': 'race'},
     {'label': 'Employment', 'value': 'employment'},
-    {'label': 'Marital Status', 'value': 'marital_status'},
-    {'label': 'Children', 'value': 'children'}
+    {'label': 'Marital Status', 'value': 'marital_status'}
 ]
 
 anthropometric_variable_mappings = [
     {'label': 'BMI Category', 'value': 'bmi_category'},
     {'label': 'Overweight', 'value': 'overweight'},
-    {'label': 'Height', 'value': 'height'},
-    {'label': 'Weight', 'value': 'weight'}
 ]
 
 chronic_condition_variable_mappings = [
