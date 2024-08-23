@@ -24,26 +24,44 @@ register_page(__name__, name='Overview', path='/overview')
 layout = dbc.Container(
     [
         dbc.Row(
-            dbc.Col(
-                dbc.Container(
-                    [
-                        html.H2("Overview of CDC Survey Data", className="display-6"),
-                        html.P(
-                            "Explore key insights and high-level summaries of the CDC Survey data from 2012-2022.",
-                            className="lead",
-                        ),
-                        html.Hr(className="my-2"),
-                        html.P(
-                            "This page provides an at-a-glance summary of key statistics, trends, and insights over time."
-                        ),
-                    ],
-                    className="p-4 bg-light rounded-3"
+            [
+                # Overview Block
+                dbc.Col(
+                    dbc.Container(
+                        [
+                            html.H2("Overview of CDC Survey Data", className="display-6"),
+                            html.P(
+                                "Explore key insights and high-level summaries of the CDC Survey data from 2012-2022.",
+                                className="lead",
+                            ),
+                            html.Hr(className="my-2"),
+                            html.P(
+                                "This page provides an at-a-glance summary of key statistics, trends, and insights over time."
+                            ),
+                        ],
+                        className="p-4 bg-light rounded-3"
+                    ),
+                    width=10,
+                    style={'marginBottom': '5px', 'marginTop': '5px'}
                 ),
-                width=14, style={'marginBottom': '20px'}
-            )
+                
+                # Navigator Menu
+                dbc.Col(
+                    html.Ul(
+                        [
+                            html.Li(html.A("State Map Visualization", href="#state-map-section")),
+                            html.Li(html.A("Population Breakdown By State, Variable", href="#population-section")),
+                            html.Li(html.A("Population Breakdown By Year, Variable", href="#year-section")),
+                        ],
+                        className="nav flex-column",
+                    ),
+                    width=2,
+                    style={'marginTop': '10px'}
+                ),
+            ]
         ),
 
-        # New Row: State Map Section Subheading
+        # State Map Section Subheading
         dbc.Row(
             dbc.Col(
                 dbc.Container(
@@ -56,28 +74,37 @@ layout = dbc.Container(
                     ],
                     className="p-3 bg-light rounded-3"
                 ),
-                width=12, style={'marginBottom': '20px'}
-            )
+                width=12, style={'marginBottom': '15px', 'marginTop': '50px'}
+            ), id="state-map-section",
         ),
 
-        # New Row: State Map Layout
+        # State Map Layout
         dbc.Row(
             [
                 dbc.Col(
                     html.Div('Select variable:', className='dropdown-label'),
                     width=1
                 ),
+                
                 dbc.Col(
-                    dcc.RadioItems(
-                        id='variable-selector-state-map',
-                        options=[
-                            {'label': 'Population', 'value': 'frequency'},
-                            {'label': 'Number of Respondents', 'value': 'count'},
+                    html.Div(
+                        [
+                            dbc.RadioItems(
+                                id="variable-selector-state-map",
+                                className="btn-group",
+                                inputClassName="btn-check",
+                                labelClassName="btn btn-outline-primary",
+                                labelCheckedClassName="active",
+                                options=[
+                                    {"label": "Population", "value": "frequency"},
+                                    {"label": "Number of Respondents", "value": "count"},
+                                ],
+                                value="frequency",
+                            ),
                         ],
-                        value='frequency',
-                        labelStyle={'display': 'inline-block'},
+                        className="radio-group",
                     ),
-                    width=2
+                    width='auto'
                 ),
             ],
             className='align-items-center g-3',
@@ -109,11 +136,10 @@ layout = dbc.Container(
                 ),
 
             ],
-            className='align-items-center justify-content-center g-3', style={'marginBottom': '20px'}
+            className='align-items-center justify-content-center g-3', style={'marginBottom': '5px', 'marginTop': '5px'}
         ),
 
-        # Population
-
+        # Population Section Subheading
         dbc.Row(
             dbc.Col(
                 dbc.Container(
@@ -124,10 +150,10 @@ layout = dbc.Container(
                             className="small"
                         ),
                     ],
-                    className="p-3 bg-light rounded-3", style={'marginBottom': '20px'}
+                    className="p-3 bg-light rounded-3", style={'marginBottom': '5px', 'marginTop': '50px'}
                 ),
                 width=12
-            )
+            ), id="population-section",
         ),
 
         dbc.Row([
@@ -169,9 +195,10 @@ layout = dbc.Container(
                 dcc.Graph(id='stacked-bar-chart-overview'),
                 width=6
             )],
-            className="mt-4", style={'marginBottom': '20px'}
+            className="mt-4", style={'marginBottom': '5px', 'marginTop': '5px'}
         ),
 
+        # Year Section Subheading
         dbc.Row(
             dbc.Col(
                 dbc.Container(
@@ -184,11 +211,11 @@ layout = dbc.Container(
                     ],
                     className="p-3 bg-light rounded-3"
                 ),
-                width=12, style={'marginBottom': '20px'}
-            )
+                width=12, style={'marginBottom': '15px', 'marginTop': '50px'}
+            ), id="year-section",
         ),
 
-    # Variable Selector and Frequency Chart with Year Slider
+        # Variable Selector and Frequency Chart with Year Slider
         dbc.Row(
             [
                 dbc.Col(
@@ -234,6 +261,7 @@ layout = dbc.Container(
     fluid=True,
     className="mt-5"
 )
+
 
 # Callbacks for the "Overview" page
 @callback(
