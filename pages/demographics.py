@@ -83,6 +83,7 @@ layout = dbc.Container(
             dbc.Col(
                 dcc.Slider(
                     id='year-slider-demographics',
+                    updatemode='drag',
                     min=2012,
                     max=2022,
                     step=1,

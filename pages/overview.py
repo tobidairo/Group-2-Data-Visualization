@@ -42,6 +42,78 @@ layout = dbc.Container(
                 width=14, style={'marginBottom': '20px'}
             )
         ),
+
+        # New Row: State Map Section Subheading
+        dbc.Row(
+            dbc.Col(
+                dbc.Container(
+                    [
+                        html.H4("State Map Visualization", className="display-7"),
+                        html.P(
+                            "Visual representation of selected variables across different states over time.",
+                            className="small"
+                        ),
+                    ],
+                    className="p-3 bg-light rounded-3"
+                ),
+                width=12, style={'marginBottom': '20px'}
+            )
+        ),
+
+        # New Row: State Map Layout
+        dbc.Row(
+            [
+                dbc.Col(
+                    html.Div('Select variable:', className='dropdown-label'),
+                    width=1
+                ),
+                dbc.Col(
+                    dcc.RadioItems(
+                        id='variable-selector-state-map',
+                        options=[
+                            {'label': 'Population', 'value': 'frequency'},
+                            {'label': 'Number of Respondents', 'value': 'count'},
+                        ],
+                        value='frequency',
+                        labelStyle={'display': 'inline-block'},
+                    ),
+                    width=2
+                ),
+            ],
+            className='align-items-center g-3',
+        ),
+        dbc.Row(
+            [
+                dbc.Col(
+                    dcc.Graph(
+                        id='choropleth-map-state-map',
+                        style={'height': '500px'},
+                    ),
+                    width=8
+                ),
+                dbc.Col([
+                    html.Div('Select year:', className='form-label'),
+                    dcc.Slider(
+                        id='year-slider-state-map',
+                        min=2012,
+                        max=2022,
+                        step=1,
+                        value=2022,
+                        marks={str(year): str(year) for year in range(2012, 2023)},
+                        vertical=True,
+                        included=False,
+                        verticalHeight=500,
+                        updatemode='drag',
+                    )],
+                    width=2,
+                ),
+
+            ],
+            className='align-items-center g-3', style={'marginBottom': '20px'}
+        ),
+
+        # Population
+
         dbc.Row(
             dbc.Col(
                 dbc.Container(
@@ -52,7 +124,7 @@ layout = dbc.Container(
                             className="small"
                         ),
                     ],
-                    className="p-3 bg-light rounded-3"
+                    className="p-3 bg-light rounded-3", style={'marginBottom': '20px'}
                 ),
                 width=12
             )
@@ -116,7 +188,7 @@ layout = dbc.Container(
             )
         ),
 
-    # Variable Selector and Frequency Chart with Year Slider on the right
+    # Variable Selector and Frequency Chart with Year Slider
         dbc.Row(
             [
                 dbc.Col(
@@ -147,13 +219,13 @@ layout = dbc.Container(
                         step=1,
                         value=2022,
                         marks={str(year): str(year) for year in range(2012, 2023)},
-                        vertical=True,  # Make the slider vertical
-                        verticalHeight=500,  # Ensure it matches the chart height
-                        included=False,  # Show only the handle, not a filled bar
-                        updatemode='drag',  # Update value on drag rather than release
+                        vertical=True,
+                        verticalHeight=500,
+                        included=False,
+                        updatemode='drag',
                     ),
                     width='auto',
-                    style={'padding': '10px', 'display': 'flex', 'alignItems': 'center', 'justifyContent': 'center'}  # Center the slider
+                    style={'padding': '10px', 'display': 'flex', 'alignItems': 'center', 'justifyContent': 'center'}
                 ),
             ],
             className='g-3'
@@ -170,20 +242,23 @@ layout = dbc.Container(
         Output('stacked-bar-chart-overview', 'figure'),
         Output('dd-output-container-overview', 'children'),
         Output('frequency-chart-overview', 'figure'),
+        Output('choropleth-map-state-map', 'figure'),
     ],
     [
         Input('state-selector-overview', 'value'),
         Input('demographic-selector-overview', 'value'),
         Input('year-slider-overview', 'value'),
         Input('variable-selector-overview', 'value'),
+        Input('year-slider-state-map', 'value'),
+        Input('variable-selector-state-map', 'value'),
     ]
 )
-def update_overview(selected_state, variable, selected_year, selected_variable):
-    # Update time series and bar chart figures
+def update_overview(selected_state, variable, selected_year, selected_variable, map_year, map_variable):
     time_series_figure = update_time_series(df, selected_state, variable)
     stacked_bar_figure = update_overview_bar(df, selected_state, variable)
     
-    # Update frequency chart and dropdown text
     dropdown_text, frequency_chart = update_frequency_chart(selected_year, selected_variable, df)
     
-    return time_series_figure, stacked_bar_figure, dropdown_text, frequency_chart
+    state_map = update_state_map(df, map_year, map_variable)
+    
+    return time_series_figure, stacked_bar_figure, dropdown_text, frequency_chart, state_map

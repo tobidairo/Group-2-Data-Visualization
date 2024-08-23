@@ -11,4 +11,3 @@ def read_data(dtypes):
     df['age_midpoint'] = df['age'].map(age_range_midpoints)
 
     return df
-

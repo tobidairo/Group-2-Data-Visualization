@@ -87,6 +87,7 @@ layout = dbc.Container(
                     step=1,
                     value=2022,
                     marks={str(year): str(year) for year in range(2012, 2023)},
+                    updatemode='drag',
                 ),
                 width=8,
                 className='mb-4'
