@@ -803,6 +803,10 @@ def update_life_health_fig(df, selected_year, lifestyle, health_var):
     # Prepare data
     plot_df = filter_and_prepare_data(df, selected_year, lifestyle, health_var)
     
+    #cast column to object type
+    plot_df[lifestyle] = plot_df[lifestyle].astype('object')
+    plot_df[health_var] = plot_df[health_var].astype('object')
+
     # Get the mapping dictionaries for lifestyle and health_var
     lifestyle_mapping = get_mapping_dict(lifestyle)
     health_mapping = get_mapping_dict(health_var)
@@ -812,7 +816,7 @@ def update_life_health_fig(df, selected_year, lifestyle, health_var):
     plot_df.loc[:, health_var] = plot_df[health_var].map(health_mapping)
     
     # Normalize frequencies to percentages
-    plot_df['percentage'] = plot_df.groupby(lifestyle)['frequency'].apply(lambda x: x / x.sum() * 100)
+    plot_df['percentage'] = plot_df.groupby(lifestyle)['frequency'].apply(lambda x: x / x.sum() * 100).reset_index(drop=True)
     plot_df['percentage_text'] = plot_df['percentage'].apply(lambda x: f'{x:.1f}%')
     
     # Generate Plotly bar chart
@@ -854,6 +858,10 @@ def update_life_anthro_fig(df, selected_year, lifestyle, anthro_var):
     # Get the mapping dictionaries for lifestyle and anthro_var
     lifestyle_mapping = get_mapping_dict(lifestyle)
     anthro_mapping = get_mapping_dict(anthro_var)
+        
+    #cast column to object type
+    plot_df[lifestyle] = plot_df[lifestyle].astype('object')
+    plot_df[anthro_var] = plot_df[anthro_var].astype('object')
     
     # Apply the mappings
     plot_df.loc[:, lifestyle] = plot_df[lifestyle].map(lifestyle_mapping)
@@ -899,6 +907,10 @@ def update_life_chronic_fig(df, selected_year, lifestyle, chronic_var, weight_co
     lifestyle_mapping = get_mapping_dict(lifestyle)
     chronic_mapping = get_mapping_dict(chronic_var)
     
+    #cast column to object type
+    plot_df[lifestyle] = plot_df[lifestyle].astype('object')
+    plot_df[chronic_var] = plot_df[chronic_var].astype('object')
+    
     # Apply the mappings
     plot_df.loc[:, lifestyle] = plot_df[lifestyle].map(lifestyle_mapping)
     plot_df.loc[:, chronic_var] = plot_df[chronic_var].map(chronic_mapping)
@@ -943,6 +955,10 @@ def update_life_access_fig(df, selected_year, lifestyle, access_var, weight_col=
     # Get the mapping dictionaries for lifestyle and access_var
     lifestyle_mapping = get_mapping_dict(lifestyle)
     access_mapping = get_mapping_dict(access_var)
+    
+    #cast column to object type
+    plot_df[lifestyle] = plot_df[lifestyle].astype('object')
+    plot_df[access_var] = plot_df[access_var].astype('object')
     
     # Apply the mappings
     plot_df.loc[:, lifestyle] = plot_df[lifestyle].map(lifestyle_mapping)
