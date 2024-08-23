@@ -356,6 +356,8 @@ def update_state_map(df, selected_year, selected_variable):
 
     if selected_variable == 'frequency':
         plot_df['colour_value'] = plot_df['frequency']
+
+        range_color = (0, 32*(10**6))
     elif selected_variable == 'count':
         plot_df = df.loc[df['year'] == selected_year]
         plot_df['state_code'] = plot_df['state'].map(state_mapping)
@@ -363,15 +365,18 @@ def update_state_map(df, selected_year, selected_variable):
         plot_df.rename(columns={'size': 'colour_value'}, inplace=True)
         print(plot_df.columns)
 
+        range_color = (0, 30000)
+
     choropleth_map = px.choropleth(
         data_frame=plot_df,
         locationmode='USA-states',
         locations='state_code',
         scope='usa',
         color='colour_value',
-        range_color=(0, 30000),
+        range_color=range_color,
         color_continuous_scale=px.colors.sequential.Blues,
-        labels={selected_variable: mapping[selected_variable]}
+        labels={'colour_value': mapping[selected_variable],
+                'state_code': 'State'},
     )
 
     return choropleth_map
