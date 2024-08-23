@@ -195,8 +195,19 @@ layout = dbc.Container(
 @callback(
     [Output(f"{title}-collapse", "is_open") for title in variable_groups.keys()],
     [Input(f"{title}-toggle", "n_clicks") for title in variable_groups.keys()],
+    [dash.dependencies.State(f"{title}-collapse", "is_open") for title in variable_groups.keys()],
 )
 def toggle_expandable(*args):
     ctx = dash.callback_context
-    return [not current_state if ctx.triggered and ctx.triggered[0]['prop_id'].split('.')[0] == f"{title}-toggle" else current_state
-            for current_state, title in zip(args, variable_groups.keys())]
+
+    if not ctx.triggered:
+        return [False] * len(variable_groups)
+
+    # Extracting the id of the element that triggered the callback
+    triggered_id = ctx.triggered[0]['prop_id'].split('.')[0]
+
+    # Determine which card to toggle
+    return [
+        not is_open if triggered_id == f"{title}-toggle" else is_open 
+        for title, is_open in zip(variable_groups.keys(), args[len(variable_groups):])
+    ]
