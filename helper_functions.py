@@ -363,7 +363,6 @@ def update_state_map(df, selected_year, selected_variable):
         plot_df['state_code'] = plot_df['state'].map(state_mapping)
         plot_df = plot_df.groupby('state_code', as_index=False).size()
         plot_df.rename(columns={'size': 'colour_value'}, inplace=True)
-        print(plot_df.columns)
 
         range_color = (0, 30000)
 
@@ -374,9 +373,20 @@ def update_state_map(df, selected_year, selected_variable):
         scope='usa',
         color='colour_value',
         range_color=range_color,
-        color_continuous_scale=px.colors.sequential.Blues,
+        color_continuous_scale=px.colors.sequential.speed,
         labels={'colour_value': mapping[selected_variable],
                 'state_code': 'State'},
+    )
+
+    choropleth_map.update_layout(
+        title={
+            'text' : f'{mapping[selected_variable]} by State',
+            'x': 0.5,
+            'xanchor': 'center',
+            'font': {
+                'size': 24
+            }
+        }
     )
 
     return choropleth_map

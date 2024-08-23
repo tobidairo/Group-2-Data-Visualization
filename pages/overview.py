@@ -109,7 +109,7 @@ layout = dbc.Container(
                 ),
 
             ],
-            className='align-items-center g-3', style={'marginBottom': '20px'}
+            className='align-items-center justify-content-center g-3', style={'marginBottom': '20px'}
         ),
 
         # Population
