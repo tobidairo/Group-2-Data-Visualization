@@ -17,7 +17,7 @@ app = Dash(__name__, use_pages=True, external_stylesheets=[dbc.themes.SLATE])
 navbar = dbc.Navbar(
     dbc.Container(
         [
-            dbc.NavbarBrand("Survey Dashboard", href="/"),
+            dbc.NavbarBrand("CDC Survey Dashboard", href="/"),
             dbc.Nav(
                 [
                     dbc.NavItem(dbc.NavLink("Homepage", href="/")),
@@ -25,11 +25,12 @@ navbar = dbc.Navbar(
                     dbc.NavItem(dbc.NavLink("Demographics", href="/demographics")),
                     dbc.NavItem(dbc.NavLink("Lifestyle", href="/lifestyle")),
                     dbc.NavItem(dbc.NavLink("Chronic Conditions", href="/chronic_conditions")),
+                    dbc.NavItem(dbc.NavLink("CDC BRFSS Website", href="https://www.cdc.gov/brfss/annual_data/annual_data.htm", target="_blank")),
                     dbc.DropdownMenu(
                         children=[
                             dbc.DropdownMenuItem("More", header=True),
-                            dbc.DropdownMenuItem("User Guide", href="/user-guide"),
-                            dbc.DropdownMenuItem("About", href="/about"),
+                            dbc.DropdownMenuItem("Surveys", href="https://www.cdc.gov/brfss/questionnaires/index.htm", target="_blank"),
+                            dbc.DropdownMenuItem("More Trends", href="https://www.cdc.gov/brfss/brfssprevalence/index.html", target="_blank")
                         ],
                         nav=True,
                         in_navbar=True,
