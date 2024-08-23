@@ -1134,7 +1134,7 @@ def update_chronic_anthro_fig(df, selected_year, chronic_condition, anthro_var):
         y='percentage',
         color=anthro_var,
         text='formatted_frequency',
-        barmode='group',
+        barmode='stack',
         title=f'{title_dictionary[anthro_var]} by {title_dictionary[chronic_condition]} ({selected_year})',
         color_discrete_sequence=randomize_colors(px.colors.qualitative.Set3),
             labels={
@@ -1222,7 +1222,7 @@ def update_chronic_lifestyle_fig(df, selected_year, chronic_condition, lifestyle
         y='percentage',
         color=lifestyle_var,
         text='formatted_frequency',
-        barmode='group',
+        barmode='stack',
         title=f'{title_dictionary[lifestyle_var]} by {title_dictionary[chronic_condition]} ({selected_year})',
         color_discrete_sequence=randomize_colors(px.colors.qualitative.Set3),
             labels={
