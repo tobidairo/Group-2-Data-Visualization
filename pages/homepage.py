@@ -180,7 +180,8 @@ layout = dbc.Container(
                         html.P(variables_intro, style={"color": "black"}),
                         *expandable_cards,
                     ],
-                    className="p-4 bg-light rounded-3"
+                    className="p-4 bg-light rounded-3",
+                    style={"margin-bottom": "25px"}
                 ),
                 width=12
             ),

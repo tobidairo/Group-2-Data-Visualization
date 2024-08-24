@@ -29,14 +29,14 @@ layout = dbc.Container(
                 dbc.Col(
                     dbc.Container(
                         [
-                            html.H2("Overview of CDC Survey Data", className="display-6"),
+                            html.H2("Overview of CDC Survey Data", className="display-6", style={"color": "black"}),
                             html.P(
                                 "Explore key insights and high-level summaries of the CDC Survey data from 2012-2022.",
-                                className="lead",
+                                className="lead", style={"color": "black"}
                             ),
                             html.Hr(className="my-2"),
                             html.P(
-                                "This page provides an at-a-glance summary of key statistics, trends, and insights over time."
+                                "This page provides an at-a-glance summary of key statistics, trends, and insights over time.", style={"color": "black"}
                             ),
                         ],
                         className="p-4 bg-light rounded-3"
@@ -66,10 +66,10 @@ layout = dbc.Container(
             dbc.Col(
                 dbc.Container(
                     [
-                        html.H4("State Map Visualization", className="display-7"),
+                        html.H4("State Map Visualization", className="display-7", style={"color": "black", "text-align": "center"}),
                         html.P(
                             "Visual representation of selected variables across different states over time.",
-                            className="small"
+                            className="small", style={"color": "black", "text-align": "center"}
                         ),
                     ],
                     className="p-3 bg-light rounded-3"
@@ -144,10 +144,10 @@ layout = dbc.Container(
             dbc.Col(
                 dbc.Container(
                     [
-                        html.H4("Population Breakdown By State, Variable", className="display-7"),
+                        html.H4("Population Breakdown By State, Variable", className="display-7", style={"color": "black", "text-align": "center"}),
                         html.P(
                             "Detailed breakdown of the population by state and selected variables.",
-                            className="small"
+                            className="small", style={"color": "black", "text-align": "center"}
                         ),
                     ],
                     className="p-3 bg-light rounded-3", style={'marginBottom': '5px', 'marginTop': '50px'}
