@@ -105,15 +105,15 @@ layout = dbc.Container(
             dbc.Col(
                 dbc.Container(
                     [
-                        html.H1("Welcome to the CDC BRFSS Annual Survey Dashboard", className="display-4"),
+                        html.H1("Welcome to the CDC BRFSS Annual Survey Dashboard", className="display-4", style={"color": "black"}),
                         html.P(
                             "This dashboard provides insights and visualizations for the U.S. population "
                             "across various demographics and lifestyle categories, from 2012-2022.",
-                            className="lead",
+                            className="lead", style={"color": "black"}
                         ),
                         html.Hr(className="my-2"),
                         html.P(
-                            "Use the navigation bar to explore detailed summaries and insights."
+                            "Use the navigation bar to explore detailed summaries and insights.", style={"color": "black"}
                         ),
                         dbc.Button("Get Started", color="primary", href="/overview"),
                     ],
@@ -173,11 +173,11 @@ layout = dbc.Container(
             dbc.Col(
                 dbc.Container(
                     [
-                        html.H3("Introduction"),
-                        html.P(introduction_text),
+                        html.H3("Introduction", style={"color": "black"}),
+                        html.P(introduction_text, style={"color": "black"}),
                         html.Hr(),
-                        html.H3("Variable Groups"),
-                        html.P(variables_intro),
+                        html.H3("Variable Groups", style={"color": "black"}),
+                        html.P(variables_intro, style={"color": "black"}),
                         *expandable_cards,
                     ],
                     className="p-4 bg-light rounded-3"
