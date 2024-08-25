@@ -157,7 +157,7 @@ layout = dbc.Container(
                                     "Visualize data related to various chronic health conditions.",
                                     className="card-text",
                                 ),
-                                dbc.Button("View Map", color="primary", href="/chronic_conditions"),
+                                dbc.Button("View Conditions", color="primary", href="/chronic_conditions"),
                             ]
                         )
                     ),
