@@ -43,7 +43,7 @@ age_range_midpoints = {
 }
 
 state_variable_mappings = [
-                            {'label': 'Income', 'value': 'Average Income'},
+                            {'label': 'Income', 'value': 'Average Household Income'},
                             {'label': 'Height', 'value': 'Average Height'},
                             {'label': 'Weight', 'value': 'Average Weight'},
                             {'label': 'Age', 'value': 'Average Age'}
@@ -69,7 +69,7 @@ population_dropdown_mappings = [
                               {'label': 'Arthritis', 'value': 'arthritis'},
                               {'label': 'Sex', 'value': 'sex'},
                               {'label': 'Age', 'value': 'age'},
-                              {'label': 'Income', 'value': 'income'},
+                              {'label': 'Household Income', 'value': 'income'},
                               {'label': 'Race', 'value': 'race'},
                               {'label': 'Smoking', 'value': 'smoking'},
                               {'label': 'Binge Drinking', 'value': 'binge_drinking'},
@@ -83,7 +83,7 @@ demographic_variable_mappings = [
     {'label': 'Education', 'value': 'education'},
     {'label': 'Sex', 'value': 'sex'},
     {'label': 'Age', 'value': 'age'},
-    {'label': 'Income', 'value': 'income'},
+    {'label': 'Household Income', 'value': 'income'},
     {'label': 'Race', 'value': 'race'},
     {'label': 'Employment', 'value': 'employment'},
     {'label': 'Marital Status', 'value': 'marital_status'}

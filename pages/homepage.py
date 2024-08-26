@@ -60,7 +60,7 @@ variable_groups = {
         "State – state where respondent resides",
         "Education – determined the highest level of education obtained by respondent",
         "Children – the number of children respondent has in the household",
-        "Income – determined income bracket of respondent",
+        "Income – determined income bracket of respondent. Note that since 2021, two additional high-income brackets have been added.",
         "Race – respondents were asked their preferred racial group",
         "Employment – determined employment status of respondents",
         "Marital status – determined marital status of respondents",

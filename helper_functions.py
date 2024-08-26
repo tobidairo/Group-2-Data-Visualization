@@ -77,7 +77,33 @@ def aggregate_custom(df, groupby_cols, value_col, result_col_name, agg_func, wei
         result[result_col_name] = result[result_col_name] / scale_factor
     return result
 
-def get_mapping_dict(selected_variable):
+def get_mapping_dict(selected_variable, year=None, time_series=False):
+    if (year == 2021 or year == 2022):
+        if selected_variable == 'income':
+            return {
+                1: 'Less than $15k',
+                2: '$15k - $25k',
+                3: '$25k - $35k',
+                4: '$35k - $50k',
+                5: '$50k - $100k',
+                6: '$100k - $200k',
+                7: '$200k or more',
+                -1: 'Other'
+            }
+        
+    if time_series:
+        if selected_variable == 'income':
+            return {
+                1: 'Less than $15k',
+                2: '$15k - $25k',
+                3: '$25k - $35k',
+                4: '$35k - $50k',
+                5: '$50k - $100k<br>(post-2021)',
+                6: '$100k - $200k<br>(post-2021)',
+                7: '$200k or more<br>(post-2021)',
+                -1: 'Other'
+            }
+        
     if selected_variable == 'state':
         return {
             1: 'Alabama', 2: 'Alaska', 4: 'Arizona', 5: 'Arkansas', 6: 'California', 8: 'Colorado',
@@ -276,15 +302,13 @@ def get_mapping_dict(selected_variable):
             -1: 'Other'
         }
 
-    elif selected_variable == 'income': # this mapping is currently only correct for 2021 and 2022
+    elif selected_variable == 'income':
         return {
-            1: 'Less than $15,000',
-            2: '$15,000 - $25,000',
-            3: '$25,000 - $35,000',
-            4: '$35,000 - $50,000',
-            5: '$50,000 - $100,000',
-            6: '$100,000 - $200,000',
-            7: '$200,000 or more',
+            1: 'Less than $15k',
+            2: '$15k - $25k',
+            3: '$25k - $35k',
+            4: '$35k - $50k',
+            5: '$50k or more',
             -1: 'Other'
         }
 
@@ -396,7 +420,7 @@ def update_frequency_chart(selected_year, selected_variable, df):
     df_grouped = df_filtered.groupby(selected_variable)
     weighted_frequency = df_grouped['wt'].sum().reset_index()
     weighted_frequency.columns = [selected_variable, 'weighted_frequency']
-    mapping_dict = get_mapping_dict(selected_variable)
+    mapping_dict = get_mapping_dict(selected_variable, year=selected_year)
     weighted_frequency['mapped_labels'] = weighted_frequency[selected_variable].map(mapping_dict)
 
     max_value = weighted_frequency['weighted_frequency'].max()
@@ -518,8 +542,8 @@ def update_dem_anthro_fig(df, selected_year, demographic, anthro_var):
     plot_df = filter_and_prepare_data(df, selected_year, demographic, anthro_var)
     
     # Get the mapping dictionaries for demographic and anthro_var
-    demographic_mapping = get_mapping_dict(demographic)
-    anthro_mapping = get_mapping_dict(anthro_var)
+    demographic_mapping = get_mapping_dict(demographic, year=selected_year)
+    anthro_mapping = get_mapping_dict(anthro_var, year=selected_year)
     
     # Apply the mappings
     plot_df[demographic] = plot_df[demographic].map(demographic_mapping)
@@ -577,8 +601,8 @@ def update_dem_chronic_fig(df, selected_year, demographic, chronic_var):
     plot_df = filter_and_prepare_data(df, selected_year, demographic, chronic_var)
     
     # Get the mapping dictionaries for demographic and chronic_var
-    demographic_mapping = get_mapping_dict(demographic)
-    chronic_mapping = get_mapping_dict(chronic_var)
+    demographic_mapping = get_mapping_dict(demographic, year=selected_year)
+    chronic_mapping = get_mapping_dict(chronic_var, year=selected_year)
     
     # Apply the mappings
     plot_df[demographic] = plot_df[demographic].map(demographic_mapping)
@@ -636,8 +660,8 @@ def update_dem_access_fig(df, selected_year, demographic, access_var):
     plot_df = filter_and_prepare_data(df, selected_year, demographic, access_var)
     
     # Get the mapping dictionaries for demographic and access_var
-    demographic_mapping = get_mapping_dict(demographic)
-    access_mapping = get_mapping_dict(access_var)
+    demographic_mapping = get_mapping_dict(demographic, year=selected_year)
+    access_mapping = get_mapping_dict(access_var, year=selected_year)
     
     # Apply the mappings
     plot_df[demographic] = plot_df[demographic].map(demographic_mapping)
@@ -695,8 +719,8 @@ def update_dem_health_fig(df, selected_year, demographic, health_var):
     plot_df = filter_and_prepare_data(df, selected_year, demographic, health_var)
     
     # Get the mapping dictionaries for demographic and health_var
-    demographic_mapping = get_mapping_dict(demographic)
-    health_mapping = get_mapping_dict(health_var)
+    demographic_mapping = get_mapping_dict(demographic, year=selected_year)
+    health_mapping = get_mapping_dict(health_var, year=selected_year)
     
     # Apply the mappings
     plot_df[demographic] = plot_df[demographic].map(demographic_mapping)
@@ -754,8 +778,8 @@ def update_dem_lifestyle_fig(df, selected_year, demographic, lifestyle_var):
     plot_df = filter_and_prepare_data(df, selected_year, demographic, lifestyle_var)
     
     # Get the mapping dictionaries for demographic and lifestyle_var
-    demographic_mapping = get_mapping_dict(demographic)
-    lifestyle_mapping = get_mapping_dict(lifestyle_var)
+    demographic_mapping = get_mapping_dict(demographic, year=selected_year)
+    lifestyle_mapping = get_mapping_dict(lifestyle_var, year=selected_year)
     
     # Apply the mappings
     plot_df[demographic] = plot_df[demographic].map(demographic_mapping)
@@ -818,8 +842,8 @@ def update_life_health_fig(df, selected_year, lifestyle, health_var):
     plot_df[health_var] = plot_df[health_var].astype('object')
 
     # Get the mapping dictionaries for lifestyle and health_var
-    lifestyle_mapping = get_mapping_dict(lifestyle)
-    health_mapping = get_mapping_dict(health_var)
+    lifestyle_mapping = get_mapping_dict(lifestyle, year=selected_year)
+    health_mapping = get_mapping_dict(health_var, year=selected_year)
     
     # Apply the mappings
     plot_df.loc[:, lifestyle] = plot_df[lifestyle].map(lifestyle_mapping)
@@ -868,8 +892,8 @@ def update_life_anthro_fig(df, selected_year, lifestyle, anthro_var):
     plot_df = filter_and_prepare_data(df, selected_year, lifestyle, anthro_var)
     
     # Get the mapping dictionaries for lifestyle and anthro_var
-    lifestyle_mapping = get_mapping_dict(lifestyle)
-    anthro_mapping = get_mapping_dict(anthro_var)
+    lifestyle_mapping = get_mapping_dict(lifestyle, year=selected_year)
+    anthro_mapping = get_mapping_dict(anthro_var, year=selected_year)
         
     #cast column to object type
     plot_df[lifestyle] = plot_df[lifestyle].astype('object')
@@ -918,8 +942,8 @@ def update_life_chronic_fig(df, selected_year, lifestyle, chronic_var, weight_co
     plot_df = filter_and_prepare_data(df, selected_year, lifestyle, chronic_var)
     
     # Get the mapping dictionaries for lifestyle and chronic_var
-    lifestyle_mapping = get_mapping_dict(lifestyle)
-    chronic_mapping = get_mapping_dict(chronic_var)
+    lifestyle_mapping = get_mapping_dict(lifestyle, year=selected_year)
+    chronic_mapping = get_mapping_dict(chronic_var, year=selected_year)
     
     #cast column to object type
     plot_df[lifestyle] = plot_df[lifestyle].astype('object')
@@ -969,8 +993,8 @@ def update_life_access_fig(df, selected_year, lifestyle, access_var, weight_col=
     plot_df = filter_and_prepare_data(df, selected_year, lifestyle, access_var)
     
     # Get the mapping dictionaries for lifestyle and access_var
-    lifestyle_mapping = get_mapping_dict(lifestyle)
-    access_mapping = get_mapping_dict(access_var)
+    lifestyle_mapping = get_mapping_dict(lifestyle, year=selected_year)
+    access_mapping = get_mapping_dict(access_var, year=selected_year)
     
     #cast column to object type
     plot_df[lifestyle] = plot_df[lifestyle].astype('object')
@@ -1037,7 +1061,7 @@ def update_time_series(df, selected_state, variable, all=False):
 
     time_series_data = time_series_data.loc[time_series_data['state'] == selected_state]
     time_series_data = time_series_data.loc[time_series_data['year'].astype(int) != 2014]
-    time_series_data[variable] = time_series_data[variable].map(get_mapping_dict(variable))
+    time_series_data[variable] = time_series_data[variable].map(get_mapping_dict(variable, time_series=True))
 
     # Calculate the total frequency for each year
     total_per_year = time_series_data.groupby('year')['frequency'].sum().reset_index()
@@ -1098,7 +1122,7 @@ def update_overview_bar(df, selected_state, variable, all=False):
 
     filtered_data = filtered_data.loc[filtered_data['state'] == selected_state]
     filtered_data = filtered_data.loc[filtered_data['year'].astype(int) != 2014]
-    filtered_data[variable] = filtered_data[variable].map(get_mapping_dict(variable))
+    filtered_data[variable] = filtered_data[variable].map(get_mapping_dict(variable, time_series=True))
 
     # Generate the stacked bar chart
     fig = px.bar(
@@ -1138,8 +1162,8 @@ def update_chronic_anthro_fig(df, selected_year, chronic_condition, anthro_var):
     plot_df = filter_and_prepare_data(df, selected_year, chronic_condition, anthro_var)
 
     # Get the mapping dictionaries for chronic_condition and anthro_var
-    chronic_mapping = get_mapping_dict(chronic_condition)
-    anthro_mapping = get_mapping_dict(anthro_var)
+    chronic_mapping = get_mapping_dict(chronic_condition, year=selected_year)
+    anthro_mapping = get_mapping_dict(anthro_var, year=selected_year)
 
     # Apply the mappings
     plot_df[chronic_condition] = plot_df[chronic_condition].map(chronic_mapping)
@@ -1182,8 +1206,8 @@ def update_chronic_health_fig(df, selected_year, chronic_condition, health_var):
     plot_df = filter_and_prepare_data(df, selected_year, chronic_condition, health_var)
 
     # Get the mapping dictionaries for chronic_condition and health_var
-    chronic_mapping = get_mapping_dict(chronic_condition)
-    health_mapping = get_mapping_dict(health_var)
+    chronic_mapping = get_mapping_dict(chronic_condition, year=selected_year)
+    health_mapping = get_mapping_dict(health_var, year=selected_year)
 
     # Apply the mappings
     plot_df[chronic_condition] = plot_df[chronic_condition].map(chronic_mapping)
@@ -1226,8 +1250,8 @@ def update_chronic_lifestyle_fig(df, selected_year, chronic_condition, lifestyle
     plot_df = filter_and_prepare_data(df, selected_year, chronic_condition, lifestyle_var)
 
     # Get the mapping dictionaries for chronic_condition and lifestyle_var
-    chronic_mapping = get_mapping_dict(chronic_condition)
-    lifestyle_mapping = get_mapping_dict(lifestyle_var)
+    chronic_mapping = get_mapping_dict(chronic_condition, year=selected_year)
+    lifestyle_mapping = get_mapping_dict(lifestyle_var, year=selected_year)
 
     # Apply the mappings
     plot_df[chronic_condition] = plot_df[chronic_condition].map(chronic_mapping)
@@ -1270,8 +1294,8 @@ def update_chronic_access_fig(df, selected_year, chronic_condition, access_var):
     plot_df = filter_and_prepare_data(df, selected_year, chronic_condition, access_var)
 
     # Get the mapping dictionaries for chronic_condition and access_var
-    chronic_mapping = get_mapping_dict(chronic_condition)
-    access_mapping = get_mapping_dict(access_var)
+    chronic_mapping = get_mapping_dict(chronic_condition, year=selected_year)
+    access_mapping = get_mapping_dict(access_var, year=selected_year)
 
     # Apply the mappings
     plot_df[chronic_condition] = plot_df[chronic_condition].map(chronic_mapping)
