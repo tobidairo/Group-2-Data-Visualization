@@ -1,17 +1,7 @@
-import pandas as pd
-import numpy as np
-import plotly.express as px
-import dash
-from dash import Dash, dcc, html, page_registry, page_container
-from dash.dependencies import Input, Output
-from mappings import state_mapping, income_bracket_midpoints, age_range_midpoints, dtypes
-from process_data import read_data
+from dash import Dash, dcc, html, page_container
 import dash_bootstrap_components as dbc
 
-print('Reading data...')
-df = read_data(dtypes)
-print('Read data.')
-
+print('Initializing app')
 app = Dash(__name__, use_pages=True, external_stylesheets=[dbc.themes.SLATE])
 
 navbar = dbc.Navbar(
@@ -79,7 +69,8 @@ app.layout = html.Div([
 ])
 
 def run_dash_app():
+    print('Running app on server')
     app.run_server(port=8050, debug=True)
 
-# if __name__ == '__main__':
-run_dash_app()
+if __name__ == '__main__':
+    run_dash_app()

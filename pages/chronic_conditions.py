@@ -1,12 +1,8 @@
-import pandas as pd
-import plotly.express as px
-
-import dash
 from dash import dcc, html, register_page, callback, State
 from dash.dependencies import Input, Output
 import dash_bootstrap_components as dbc
 
-from app import df
+from process_data import df
 from mappings import chronic_condition_variable_mappings, health_measure_variable_mappings, anthropometric_variable_mappings, lifestyle_variable_mappings, healthcare_access_variable_mappings
 from helper_functions import update_chronic_access_fig, update_chronic_health_fig, update_chronic_lifestyle_fig, update_chronic_anthro_fig
 

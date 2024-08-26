@@ -1,11 +1,7 @@
-import pandas as pd
-import numpy as np
-import plotly.express as px
 import dash
-from dash import dcc, html, register_page, callback
+from dash import html, register_page, callback
 import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output
-from app import df
 
 register_page(__name__, name='Homepage', path='/')
 

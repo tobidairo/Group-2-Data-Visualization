@@ -1,3 +1,5 @@
+# Run this script to download the data file required by the dashboard
+
 import gdown
 
 def download_data(file_id):

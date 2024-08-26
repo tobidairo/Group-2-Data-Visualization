@@ -1,21 +1,9 @@
-import pandas as pd
-import numpy as np
-import plotly.express as px
-import dash
 from dash import Dash, dcc, html, register_page, callback, Input, Output
 import dash_bootstrap_components as dbc
 
-from app import df
-from helper_functions import (
-    weighted_mean, weighted_median_interpolated, weighted_frequency, 
-    aggregate_weighted_frequency, aggregate_custom, get_mapping_dict, 
-    update_state_map, update_frequency_chart, update_time_series, update_overview_bar
-)
-from mappings import (
-    dtypes, state_mapping, income_bracket_midpoints, age_range_midpoints, 
-    state_variable_mappings, population_dropdown_mappings, 
-    state_fullname_mappings, demographic_variable_mappings
-)
+from process_data import df
+from helper_functions import update_state_map, update_frequency_chart, update_time_series, update_overview_bar
+from mappings import population_dropdown_mappings, state_fullname_mappings, demographic_variable_mappings
 
 # Register the "Overview" page
 register_page(__name__, name='Overview', path='/overview')

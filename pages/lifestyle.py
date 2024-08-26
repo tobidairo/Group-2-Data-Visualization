@@ -1,13 +1,9 @@
-import pandas as pd
-import numpy as np
-import plotly.express as px
-import dash
-from dash import Dash, dcc, html, register_page, callback
+from dash import dcc, html, register_page, callback
 from dash.dependencies import Input, Output
 import dash_bootstrap_components as dbc
-from mappings import lifestyle_variable_mappings, health_measure_variable_mappings, demographic_variable_mappings, anthropometric_variable_mappings, chronic_condition_variable_mappings, healthcare_access_variable_mappings
+from mappings import lifestyle_variable_mappings, health_measure_variable_mappings, anthropometric_variable_mappings, chronic_condition_variable_mappings, healthcare_access_variable_mappings
 from helper_functions import update_life_access_fig, update_life_anthro_fig, update_life_health_fig, update_life_chronic_fig
-from app import df
+from process_data import df
 
 register_page(__name__, name='Lifestyle', path='/lifestyle')
 
