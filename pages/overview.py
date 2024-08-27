@@ -191,10 +191,10 @@ layout = dbc.Container(
             dbc.Col(
                 dbc.Container(
                     [
-                        html.H4("Population Breakdown By Year, Variable", className="display-7"),
+                        html.H4("Population Breakdown By Year, Variable", className="display-7", style={"color": "black", "text-align": "center"}),
                         html.P(
                             "Year-wise population breakdown based on selected variables.",
-                            className="small"
+                            className="small", style={"color": "black", "text-align": "center"}
                         ),
                     ],
                     className="p-3 bg-light rounded-3"
