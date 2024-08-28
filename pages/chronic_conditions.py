@@ -6,7 +6,7 @@ from process_data import df
 from mappings import chronic_condition_variable_mappings, health_measure_variable_mappings, anthropometric_variable_mappings, lifestyle_variable_mappings, healthcare_access_variable_mappings
 from helper_functions import update_chronic_access_fig, update_chronic_health_fig, update_chronic_lifestyle_fig, update_chronic_anthro_fig
 
-register_page(__name__, name='Chronic Conditions', path='/chronic_conditions')
+register_page(__name__, name='Health Conditions', path='/health_conditions')
 
 
 layout = dbc.Container(
@@ -28,7 +28,7 @@ layout = dbc.Container(
                             [
                                 html.H5("How to Use the Graphs", className="alert-heading"),
                                 html.P(
-                                    "At the top of the page, you can select a chronic condition variable and a year. "
+                                    "At the top of the page, you can select a health condition variable and a year. "
                                     "These selections will apply to all graphs below. "
                                     "Each graph represents a different category. "
                                     "You can further refine each graph by selecting additional variables specific to that category."
@@ -61,7 +61,7 @@ layout = dbc.Container(
         dbc.Row(
             dbc.Col(
                 [
-                    html.Label('Select Chronic Condition Variable:', className='dropdown-label'),
+                    html.Label('Select Health Condition Variable:', className='dropdown-label'),
                     dcc.Dropdown(
                         id='chronic-condition-dropdown',
                         options=chronic_condition_variable_mappings,  # Replace with your actual options

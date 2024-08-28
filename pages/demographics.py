@@ -133,7 +133,7 @@ layout = dbc.Container(
             [
                 dbc.Col(
                     [
-                        html.Div('Chronic Conditions', className='form-label'),
+                        html.Div('Health Conditions', className='form-label'),
                         dcc.Dropdown(
                             id='chronic-conditions-selector-demographics',
                             options=chronic_condition_variable_mappings,  # Replace with your actual options
