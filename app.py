@@ -1,5 +1,6 @@
 from dash import Dash, dcc, html, page_container
 import dash_bootstrap_components as dbc
+from pyngrok import ngrok
 
 print('Initializing app')
 app = Dash(__name__, use_pages=True, external_stylesheets=[dbc.themes.SLATE])
@@ -69,6 +70,10 @@ app.layout = html.Div([
 ])
 
 def run_dash_app():
+    print('Starting ngrok tunnel...')
+    public_url = ngrok.connect(8050)
+    print(f'Public URL: {public_url}')
+    
     print('Running app on server')
     app.run_server(port=8050, debug=False)
 

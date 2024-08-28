@@ -1194,7 +1194,7 @@ def update_chronic_anthro_fig(df, selected_year, chronic_condition, anthro_var):
         font=dict(color='white'),  # Ensure text is visible on the white background
         xaxis=dict(showgrid=False),  # Optional: light gridlines
         yaxis=dict(showgrid=True, gridcolor='LightGray'),
-        yaxis_title='Percentage of Chronic Condition',
+        yaxis_title='Percentage of Group',
         xaxis_title=title_dictionary[chronic_condition],
         uniformtext_minsize=8, uniformtext_mode='hide'
     )
@@ -1238,7 +1238,7 @@ def update_chronic_health_fig(df, selected_year, chronic_condition, health_var):
         font=dict(color='white'),  # Ensure text is visible on the white background
         xaxis=dict(showgrid=False),  # Optional: light gridlines
         yaxis=dict(showgrid=True, gridcolor='LightGray'),
-        yaxis_title='Percentage of Chronic Condition',
+        yaxis_title='Percentage of Group',
         xaxis_title=title_dictionary[chronic_condition],
         uniformtext_minsize=8, uniformtext_mode='hide'
     )
@@ -1282,7 +1282,7 @@ def update_chronic_lifestyle_fig(df, selected_year, chronic_condition, lifestyle
         font=dict(color='white'),  # Ensure text is visible on the white background
         xaxis=dict(showgrid=False),  # Optional: light gridlines
         yaxis=dict(showgrid=True, gridcolor='LightGray'),
-        yaxis_title='Percentage of Chronic Condition',
+        yaxis_title='Percentage of Group',
         xaxis_title=title_dictionary[chronic_condition],
         uniformtext_minsize=8, uniformtext_mode='hide'
     )
@@ -1326,7 +1326,7 @@ def update_chronic_access_fig(df, selected_year, chronic_condition, access_var):
         font=dict(color='white'),  # Ensure text is visible on the white background
         xaxis=dict(showgrid=False),  # Optional: light gridlines
         yaxis=dict(showgrid=True, gridcolor='LightGray'),
-        yaxis_title='Percentage of Chronic Condition',
+        yaxis_title='Percentage of Group',
         xaxis_title=title_dictionary[chronic_condition],
         uniformtext_minsize=8, uniformtext_mode='hide'
     )
