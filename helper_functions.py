@@ -3,7 +3,7 @@ import pandas as pd
 import plotly.express as px
 from mappings import title_dictionary, state_mapping
 import random
-
+from dash import html, dcc
 
 def weighted_mean(df, value_col, weight_col):
     df = df[df[value_col] != -1]  # Filter out invalid values
@@ -1332,3 +1332,146 @@ def update_chronic_access_fig(df, selected_year, chronic_condition, access_var):
     )
 
     return fig
+
+import pandas as pd
+
+def calculate_weighted_median_income(filtered_df, selected_year):
+    # Define income ranges for interpolation
+    if selected_year >= 2021:
+        income_ranges = {
+            1: (0, 15000),
+            2: (15000, 25000),
+            3: (25000, 35000),
+            4: (35000, 50000),
+            5: (50000, 100000),
+            6: (100000, 200000),
+            7: (200000, float('inf')),
+        }
+        bound_multiplier = 1.5
+    else:
+        income_ranges = {
+            1: (0, 15000),
+            2: (15000, 25000),
+            3: (25000, 35000),
+            4: (35000, 50000),
+            5: (50000, float('inf')),
+        }
+        bound_multiplier = 2
+    
+    # Filter out 'Other' (-1) income category
+    filtered_df = filtered_df[filtered_df['income'] != -1]
+    
+    # Sort by income bracket
+    filtered_df = filtered_df.sort_values('income', ascending=True)
+    
+    # Calculate cumulative weight
+    filtered_df['cum_weight'] = filtered_df['wt'].cumsum()
+    
+    # Calculate the median weight (which is 50% of the total weight)
+    total_weight = filtered_df['wt'].sum()
+    median_weight = total_weight / 2.0
+    
+    # Find the row where cumulative weight first exceeds the median weight
+    median_row = filtered_df[filtered_df['cum_weight'] >= median_weight].iloc[0]
+    
+    # Determine the income bracket
+    income_bracket = median_row['income']
+    
+    # Get the cumulative weight just before the median weight
+    previous_cum_weights = filtered_df[filtered_df['cum_weight'] < median_weight]['cum_weight']
+    if not previous_cum_weights.empty:
+        previous_cum_weight = previous_cum_weights.max()
+    else:
+        previous_cum_weight = 0
+    
+    # Linear interpolation within the income bracket
+    lower_bound, upper_bound = income_ranges[income_bracket]
+    weight_in_bracket = median_weight - previous_cum_weight
+    weight_in_current_bracket = median_row['wt']
+    
+    if upper_bound == float('inf'):
+        # If the upper bound is infinity, assume it's a large value for interpolation
+        upper_bound = lower_bound * bound_multiplier
+    
+    median_income = lower_bound + (weight_in_bracket / weight_in_current_bracket) * (upper_bound - lower_bound)
+    
+    return median_income
+
+def get_kpi_card_info(df, selected_state, selected_year):
+    filtered_df = df[(df['year'] == selected_year) & (df['state'] == selected_state)]
+
+    population = filtered_df['wt'].sum()
+
+    if population > 0:
+        avg_age = (filtered_df['age_midpoint'] * filtered_df['wt']).sum() / population
+    else:
+        avg_age = float('nan')
+    
+    employed = filtered_df['employment'].value_counts()[1]
+    unemployed = filtered_df['employment'].value_counts()[2]
+    employment = employed / (employed + unemployed) * 100
+
+    income = calculate_weighted_median_income(filtered_df, selected_year)
+
+    population_change = population_change_percent = "N/A"
+    avg_age_change = avg_age_change_percent = "N/A"
+    employment_change = employment_change_percent = "N/A"
+    income_change = income_change_percent = "N/A"
+
+
+    if selected_year > df['year'].min():
+        previous_year_df = df[(df['year'] == selected_year - 1) & (df['state'] == selected_state)]
+        previous_population = previous_year_df['wt'].sum()
+
+        if previous_population > 0:
+            population_change = population - previous_population
+            population_change_percent = (population_change / previous_population) * 100
+
+        previous_avg_age = (previous_year_df['age_midpoint'] * previous_year_df['wt']).sum() / previous_population if previous_population > 0 else np.nan
+        if not np.isnan(previous_avg_age):
+            avg_age_change = avg_age - previous_avg_age
+            avg_age_change_percent = (avg_age_change / previous_avg_age) * 100
+        
+        previous_employment = (100 * previous_year_df['employment'].value_counts()[1]) / (previous_year_df['employment'].value_counts()[1] + previous_year_df['employment'].value_counts()[2]) if previous_population > 0 else np.nan
+        if not np.isnan(previous_employment):
+            employment_change = employment - previous_employment
+            employment_change_percent = employment_change
+
+        previous_income = calculate_weighted_median_income(previous_year_df, selected_year - 1) if previous_population > 0 else np.nan
+        if not np.isnan(previous_income):
+            income_change = income - previous_income
+            income_change_percent = (income_change / previous_income) * 100
+
+    population_display = f"{population:,.0f}"  # Format population with commas
+    avg_age_display = f"{avg_age:.1f}"  # Format average age to one decimal place
+    employment_display = f"{employment:.1f}%"
+    income_display = f"${income:,.0f}"
+
+    population_change_display = format_change(population_change, population_change_percent)
+    avg_age_change_display = format_change(avg_age_change, avg_age_change_percent, decimal=True)
+    employment_change_display = format_change(employment_change, employment_change_percent, decimal=True, rate=True)
+    income_change_display = format_change(income_change, income_change_percent, income=True)
+
+
+    return (population_display, population_change_display, avg_age_display, avg_age_change_display, employment_display, employment_change_display, income_display, income_change_display)
+
+def format_change(change, change_percent, decimal=False, rate=False, income=False):
+    """
+    Formats the numerical change and percentage change with arrow icons and color coding.
+    """
+    if change == "N/A":
+        return "N/A"
+
+    arrow = "↑" if change > 0 else "↓"
+    color = "green" if change > 0 else "red"
+    if income:
+        formatted_change = f"{arrow} ${abs(change):,.1f} ({abs(change_percent):.1f}%)"
+    elif rate:
+        formatted_change = f"{arrow} {abs(change):,.1f}%"
+    elif decimal:
+        formatted_change = f"{arrow} {abs(change):,.1f} ({abs(change_percent):.1f}%)"
+    else:
+        formatted_change = f"{arrow} {abs(change):,.0f} ({abs(change_percent):.1f}%)"
+
+
+    return html.Span([formatted_change], style={"color": color})
