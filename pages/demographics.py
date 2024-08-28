@@ -1,8 +1,8 @@
 from dash import dcc, html, register_page, callback
 from dash.dependencies import Input, Output
 import dash_bootstrap_components as dbc
-from mappings import lifestyle_variable_mappings, health_measure_variable_mappings, demographic_variable_mappings, anthropometric_variable_mappings, chronic_condition_variable_mappings, healthcare_access_variable_mappings
-from helper_functions import update_dem_access_fig, update_dem_anthro_fig, update_dem_health_fig, update_dem_chronic_fig, update_dem_lifestyle_fig
+from mappings import lifestyle_variable_mappings, health_measure_variable_mappings, demographic_variable_mappings, anthropometric_variable_mappings, health_condition_variable_mappings, healthcare_access_variable_mappings
+from helper_functions import update_dem_access_fig, update_dem_anthro_fig, update_dem_health_fig, update_dem_condition_fig, update_dem_lifestyle_fig
 from process_data import df
 
 register_page(__name__, name='Demographics', path='/demographics')
@@ -133,16 +133,16 @@ layout = dbc.Container(
             [
                 dbc.Col(
                     [
-                        html.Div('Chronic Conditions', className='form-label'),
+                        html.Div('Health Conditions', className='form-label'),
                         dcc.Dropdown(
-                            id='chronic-conditions-selector-demographics',
-                            options=chronic_condition_variable_mappings,  # Replace with your actual options
+                            id='health-conditions-selector-demographics',
+                            options=health_condition_variable_mappings,  # Replace with your actual options
                             value='asthma',  # Default value
                             clearable=False,
                             className='mb-2'
                         ),
-                        dcc.Graph(id='graph-chronic-conditions-demographics', style={'height': '400px'}),
-                        html.Div(id='explanation-chronic-conditions-demographics', className='text-muted mt-2')
+                        dcc.Graph(id='graph-health-conditions-demographics', style={'height': '400px'}),
+                        html.Div(id='explanation-health-conditions-demographics', className='text-muted mt-2')
                     ],
                     width=6
                 ),
@@ -194,7 +194,7 @@ from dash import callback, Output, Input, State
 @callback(
     [
         Output('graph-anthropometrics-demographics', 'figure'),
-        Output('graph-chronic-conditions-demographics', 'figure'),
+        Output('graph-health-conditions-demographics', 'figure'),
         Output('graph-healthcare-access-demographics', 'figure'),
         Output('graph-health-measures-demographics', 'figure'),
         Output('graph-lifestyle-demographics', 'figure'),
@@ -204,7 +204,7 @@ from dash import callback, Output, Input, State
         Input('demographic-selector-demographics', 'value'),
         Input('year-slider-demographics', 'value'),
         Input('anthropometrics-selector-demographics', 'value'),
-        Input('chronic-conditions-selector-demographics', 'value'),
+        Input('health-conditions-selector-demographics', 'value'),
         Input('healthcare-access-selector-demographics', 'value'),
         Input('health-measures-selector-demographics', 'value'),
         Input('lifestyle-selector-demographics', 'value'),
@@ -212,10 +212,10 @@ from dash import callback, Output, Input, State
     ],
     [State('alert-collapse-section-demographics', 'is_open')]  # State to track if the alert is open
 )
-def update_graphs_and_toggle_alert(demographic, selected_year, anthro_var, chronic_var, access_var, health_var, lifestyle_var, n_clicks, is_open):
+def update_graphs_and_toggle_alert(demographic, selected_year, anthro_var, condition_var, access_var, health_var, lifestyle_var, n_clicks, is_open):
     # Generate each figure using the respective update function
     fig_anthro = update_dem_anthro_fig(df, selected_year, demographic, anthro_var)
-    fig_chronic = update_dem_chronic_fig(df, selected_year, demographic, chronic_var)
+    fig_condition = update_dem_condition_fig(df, selected_year, demographic, condition_var)
     fig_access = update_dem_access_fig(df, selected_year, demographic, access_var)
     fig_health = update_dem_health_fig(df, selected_year, demographic, health_var)
     fig_lifestyle = update_dem_lifestyle_fig(df, selected_year, demographic, lifestyle_var)
@@ -225,6 +225,6 @@ def update_graphs_and_toggle_alert(demographic, selected_year, anthro_var, chron
         is_open = not is_open
 
     # Return all figures plus the state of the alert collapse
-    return fig_anthro, fig_chronic, fig_access, fig_health, fig_lifestyle, is_open
+    return fig_anthro, fig_condition, fig_access, fig_health, fig_lifestyle, is_open
 
 

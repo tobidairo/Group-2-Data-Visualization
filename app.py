@@ -14,7 +14,7 @@ navbar = dbc.Navbar(
                     dbc.NavItem(dbc.NavLink("Overview", href="/overview")),
                     dbc.NavItem(dbc.NavLink("Demographics", href="/demographics")),
                     dbc.NavItem(dbc.NavLink("Lifestyle", href="/lifestyle")),
-                    dbc.NavItem(dbc.NavLink("Chronic Conditions", href="/chronic_conditions")),
+                    dbc.NavItem(dbc.NavLink("Health Conditions", href="/health_conditions")),
                     dbc.NavItem(dbc.NavLink("CDC BRFSS Website", href="https://www.cdc.gov/brfss/annual_data/annual_data.htm", target="_blank")),
                     dbc.DropdownMenu(
                         children=[

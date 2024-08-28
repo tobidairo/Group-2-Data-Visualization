@@ -94,7 +94,7 @@ anthropometric_variable_mappings = [
     {'label': 'Overweight', 'value': 'overweight'},
 ]
 
-chronic_condition_variable_mappings = [
+health_condition_variable_mappings = [
     {'label': 'Stroke', 'value': 'stroke'},
     {'label': 'Asthma', 'value': 'asthma'},
     {'label': 'Arthritis', 'value': 'arthritis'},

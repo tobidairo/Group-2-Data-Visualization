@@ -1,8 +1,8 @@
 from dash import dcc, html, register_page, callback
 from dash.dependencies import Input, Output
 import dash_bootstrap_components as dbc
-from mappings import lifestyle_variable_mappings, health_measure_variable_mappings, anthropometric_variable_mappings, chronic_condition_variable_mappings, healthcare_access_variable_mappings
-from helper_functions import update_life_access_fig, update_life_anthro_fig, update_life_health_fig, update_life_chronic_fig
+from mappings import lifestyle_variable_mappings, health_measure_variable_mappings, anthropometric_variable_mappings, health_condition_variable_mappings, healthcare_access_variable_mappings
+from helper_functions import update_life_access_fig, update_life_anthro_fig, update_life_health_fig, update_life_condition_fig
 from process_data import df
 
 register_page(__name__, name='Lifestyle', path='/lifestyle')
@@ -133,16 +133,16 @@ layout = dbc.Container(
             [
                 dbc.Col(
                     [
-                        html.Div('Chronic Conditions', className='form-label'),
+                        html.Div('Health Conditions', className='form-label'),
                         dcc.Dropdown(
-                            id='chronic-conditions-selector-lifestyle',
-                            options=chronic_condition_variable_mappings,
+                            id='health-conditions-selector-lifestyle',
+                            options=health_condition_variable_mappings,
                             value='asthma',  # Default value
                             clearable=False,
                             className='mb-2'
                         ),
-                        dcc.Graph(id='graph-chronic-conditions-lifestyle', style={'height': '400px'}),
-                        html.Div(id='explanation-chronic-conditions-lifestyle', className='text-muted mt-2')
+                        dcc.Graph(id='graph-health-conditions-lifestyle', style={'height': '400px'}),
+                        html.Div(id='explanation-health-conditions-lifestyle', className='text-muted mt-2')
                     ],
                     width=6
                 ),
@@ -175,7 +175,7 @@ from dash import callback, Output, Input, State
     [
         Output('graph-health-measures-lifestyle', 'figure'),
         Output('graph-anthropometrics-lifestyle', 'figure'),
-        Output('graph-chronic-conditions-lifestyle', 'figure'),
+        Output('graph-health-conditions-lifestyle', 'figure'),
         Output('graph-healthcare-access-lifestyle', 'figure'),
         Output('alert-collapse-section-lifestyle', 'is_open'),  # Add this Output for the alert
     ],
@@ -184,17 +184,17 @@ from dash import callback, Output, Input, State
         Input('year-slider-lifestyle', 'value'),
         Input('health-measures-selector-lifestyle', 'value'),
         Input('anthropometrics-selector-lifestyle', 'value'),
-        Input('chronic-conditions-selector-lifestyle', 'value'),
+        Input('health-conditions-selector-lifestyle', 'value'),
         Input('healthcare-access-selector-lifestyle', 'value'),
         Input('alert-collapse-button-lifestyle', 'n_clicks'),  # Add this Input for the alert button
     ],
     [State('alert-collapse-section-lifestyle', 'is_open')]  # State to track if the alert is open
 )
-def update_graphs_and_toggle_alert(lifestyle, selected_year, health_var, anthro_var, chronic_var, access_var, n_clicks, is_open):
+def update_graphs_and_toggle_alert(lifestyle, selected_year, health_var, anthro_var, condition_var, access_var, n_clicks, is_open):
     # Generate each figure using the respective update function
     fig_health = update_life_health_fig(df, selected_year, lifestyle, health_var)
     fig_anthro = update_life_anthro_fig(df, selected_year, lifestyle, anthro_var)
-    fig_chronic = update_life_chronic_fig(df, selected_year, lifestyle, chronic_var)
+    fig_condition = update_life_condition_fig(df, selected_year, lifestyle, condition_var)
     fig_access = update_life_access_fig(df, selected_year, lifestyle, access_var)
 
     # Handle the alert collapse functionality
@@ -202,6 +202,6 @@ def update_graphs_and_toggle_alert(lifestyle, selected_year, health_var, anthro_
         is_open = not is_open
 
     # Return all figures plus the state of the alert collapse
-    return fig_health, fig_anthro, fig_chronic, fig_access, is_open
+    return fig_health, fig_anthro, fig_condition, fig_access, is_open
 
 

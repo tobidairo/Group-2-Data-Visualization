@@ -9,7 +9,7 @@ register_page(__name__, name='Homepage', path='/')
 introduction_text = (
     "This dashboard contains visualizations of selected variables from the CDC BRFSS dataset. "
     "The BRFSS is a health-related survey conducted in the US covering health-related risk behaviors, "
-    "chronic health conditions, and the use of preventative services. It provides comprehensive US population data "
+    "health conditions, and the use of preventative services. It provides comprehensive US population data "
     "from diverse variables and has vast applications across public health. "
     "We have created an interactive version of this dataset for researchers to be able to select and specify "
     "information relevant to their area of study."
@@ -148,12 +148,12 @@ layout = dbc.Container(
                     dbc.Card(
                         dbc.CardBody(
                             [
-                                html.H4("Chronic Conditions", className="card-title"),
+                                html.H4("Health Conditions", className="card-title"),
                                 html.P(
-                                    "Visualize data related to various chronic health conditions.",
+                                    "Visualize data related to various health conditions.",
                                     className="card-text",
                                 ),
-                                dbc.Button("View Conditions", color="primary", href="/chronic_conditions"),
+                                dbc.Button("View Conditions", color="primary", href="/health_conditions"),
                             ]
                         )
                     ),
