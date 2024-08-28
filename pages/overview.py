@@ -86,7 +86,7 @@ layout = dbc.Container(
                 dbc.Col(
                     html.Ul(
                         [
-                            html.Li(html.A("State Map Visualization", href="#state-map-section")),
+                            html.Li(html.A("State Overview", href="#state-map-section")),
                             html.Li(html.A("Population Breakdown By State, Variable", href="#population-section")),
                             html.Li(html.A("Population Breakdown By Year, Variable", href="#year-section")),
                         ],
@@ -103,7 +103,7 @@ layout = dbc.Container(
             dbc.Col(
                 dbc.Container(
                     [
-                        html.H4("State Map Visualization", className="display-7", style={"color": "black", "text-align": "center"}),
+                        html.H4("State Overview", className="display-7", style={"color": "black", "text-align": "center"}),
                         html.P(
                             "Visual representation of selected variables across different states over time.",
                             className="small", style={"color": "black", "text-align": "center"}
