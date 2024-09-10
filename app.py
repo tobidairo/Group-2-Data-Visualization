@@ -69,13 +69,17 @@ app.layout = html.Div([
     footer,
 ])
 
-def run_dash_app():
-    print('Starting ngrok tunnel...')
-    public_url = ngrok.connect(8050)
-    print(f'Public URL: {public_url}')
-    
-    print('Running app on server')
-    app.run_server(port=8050, debug=False)
+server = app.server
 
 if __name__ == '__main__':
-    run_dash_app()
+    print('Running app locally')
+    app.run_server(port=8050, debug=True)
+
+# def run_dash_app():
+#     print('Starting ngrok tunnel...')
+#     public_url = ngrok.connect(8050)
+#     print(f'Public URL: {public_url}')
+    
+#     print('Running app on server')
+#     app.run_server(port=8050, debug=False)
+
